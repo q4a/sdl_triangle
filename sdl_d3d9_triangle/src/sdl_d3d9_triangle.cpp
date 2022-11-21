@@ -124,7 +124,7 @@ void Cleanup()
 	d3d::Release<IDirect3DVertexBuffer9*>(Triangle);
 }
 
-bool Display()
+void ShowPrimitive()
 {
 	if (Device)
 	{
@@ -140,7 +140,6 @@ bool Display()
 		Device->EndScene();
 		Device->Present(0, 0, 0, 0);
 	}
-	return true;
 }
 
 
@@ -215,7 +214,7 @@ int main(int argc, char* argv[]) {
 				break;
 			}
 		}
-		Display();
+		ShowPrimitive();
 	}
 
 	//Cleaning up everything.
