@@ -32,8 +32,8 @@ else() # for DXVK Native
 
     include(ExternalProject)
     ExternalProject_Add(dxvk-native
-        GIT_REPOSITORY    https://github.com/Joshua-Ashton/dxvk-native
-        GIT_TAG           a2dc99c407340432d4ba5bfa29efa685c27942ea
+        GIT_REPOSITORY    https://github.com/IonAgorria/dxvk-native
+        GIT_TAG           2e91e784a86bc1355100518cd90eee48433551ac
         GIT_SHALLOW       ON
         BUILD_ALWAYS      OFF
         CONFIGURE_HANDLED_BY_BUILD ON
