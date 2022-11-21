@@ -32,8 +32,44 @@ struct Vertex
 };
 const DWORD Vertex::FVF = D3DFVF_XYZ;
 
+// Additional math functions
+
+static inline D3DMATRIX* MatrixIdentity(D3DMATRIX* pout)
+{
+	if (!pout) return nullptr;
+	pout->m[0][1] = 0.0f;
+	pout->m[0][2] = 0.0f;
+	pout->m[0][3] = 0.0f;
+	pout->m[1][0] = 0.0f;
+	pout->m[1][2] = 0.0f;
+	pout->m[1][3] = 0.0f;
+	pout->m[2][0] = 0.0f;
+	pout->m[2][1] = 0.0f;
+	pout->m[2][3] = 0.0f;
+	pout->m[3][0] = 0.0f;
+	pout->m[3][1] = 0.0f;
+	pout->m[3][2] = 0.0f;
+	pout->m[0][0] = 1.0f;
+	pout->m[1][1] = 1.0f;
+	pout->m[2][2] = 1.0f;
+	pout->m[3][3] = 1.0f;
+	return pout;
+}
+
+D3DMATRIX* MatrixPerspectiveFovLH(D3DMATRIX* pout, float fovy, float aspect, float zn, float zf)
+{
+	MatrixIdentity(pout);
+	pout->m[0][0] = 1.0f / (aspect * tanf(fovy / 2.0f));
+	pout->m[1][1] = 1.0f / tanf(fovy / 2.0f);
+	pout->m[2][2] = zf / (zf - zn);
+	pout->m[2][3] = 1.0f;
+	pout->m[3][2] = (zf * zn) / (zn - zf);
+	pout->m[3][3] = 0.0f;
+	return pout;
+}
+
 // Framework Functions
-//
+
 bool Setup()
 {
 	//
@@ -65,10 +101,10 @@ bool Setup()
 	// Set the projection matrix.
 	//
 
-	D3DXMATRIX proj;
-	D3DXMatrixPerspectiveFovLH(
+	D3DMATRIX proj;
+	MatrixPerspectiveFovLH(
 		&proj,                        // result
-		D3DX_PI * 0.5f,               // 90 - degrees
+		M_PI * 0.5f,                  // 90 - degrees
 		(float)Width / (float)Height, // aspect ratio
 		1.0f,                         // near plane
 		1000.0f);                     // far plane
@@ -82,6 +118,7 @@ bool Setup()
 
 	return true;
 }
+
 void Cleanup()
 {
 	d3d::Release<IDirect3DVertexBuffer9*>(Triangle);
