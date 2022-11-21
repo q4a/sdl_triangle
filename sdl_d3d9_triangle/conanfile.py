@@ -7,8 +7,12 @@ class SdlPure(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
 
     # dependencies used in deploy binaries
-    requires = [
-        "sdl/2.0.18", # conan-center
-        "directx/9.0@storm/prebuilt" # storm.jfrog.io
-    ]
+    # conan-center
+    requires = ["sdl/2.0.18"]
+    # optional dependencies
+    def requirements(self):
+        if self.settings.os == "Windows":
+            # storm.jfrog.io
+            self.requires("directx/9.0@storm/prebuilt")
+
     generators = "cmake_multi"
