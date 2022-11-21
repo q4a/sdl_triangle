@@ -72,9 +72,7 @@ D3DMATRIX* MatrixPerspectiveFovLH(D3DMATRIX* pout, float fovy, float aspect, flo
 
 bool Setup()
 {
-	//
 	// Create the vertex buffer.
-	//
 
 	Device->CreateVertexBuffer(
 		3 * sizeof(Vertex), // size in bytes
@@ -84,9 +82,7 @@ bool Setup()
 		&Triangle,          // return create vertex buffer
 		0);                 // not used - set to 0
 
-	//
 	// Fill the buffers with the triangle data.
-	//
 
 	Vertex* vertices;
 	Triangle->Lock(0, 0, (void**)&vertices, 0);
@@ -97,9 +93,7 @@ bool Setup()
 
 	Triangle->Unlock();
 
-	//
 	// Set the projection matrix.
-	//
 
 	D3DMATRIX proj;
 	MatrixPerspectiveFovLH(
@@ -110,9 +104,7 @@ bool Setup()
 		1000.0f);                     // far plane
 	Device->SetTransform(D3DTS_PROJECTION, &proj);
 
-	//
 	// Set wireframe mode render state.
-	//
 
 	Device->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 
@@ -158,7 +150,7 @@ SDL_Window* createWindowContext(std::string title) {
 	//Declaring the variable the return later.
 	SDL_Window* Window = NULL;
 
-	//Creating the window and passing that reference to the previously declared variable. 
+	//Creating the window and passing that reference to the previously declared variable.
 	Window = SDL_CreateWindow("Hello World!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Width, Height, SDL_WINDOW_OPENGL);
 
 	//Returning the newly creted Window context.

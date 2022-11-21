@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
-// 
+//
 // File: d3dUtility.cpp
-// 
+//
 // Author: Frank Luna (C) All Rights Reserved
 //
 // System: AMD Athlon 1800+ XP, 512 DDR, Geforce 3, Windows XP, MSVC++ 7.0 
 //
 // Desc: Provides utility functions for simplifying common tasks.
-//          
+//
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "d3d_utility.h"
@@ -19,18 +19,16 @@ bool d3d::InitD3D(
 	D3DDEVTYPE deviceType,
 	IDirect3DDevice9** device)
 {
-	//
-	// Init D3D: 
-	//
+	// Init D3D:
 
 	HRESULT hr = 0;
 
 	// Step 1: Create the IDirect3D9 object.
 
 	IDirect3D9* d3d9 = 0;
-    d3d9 = Direct3DCreate9(D3D_SDK_VERSION);
+	d3d9 = Direct3DCreate9(D3D_SDK_VERSION);
 
-    if( !d3d9 )
+	if( !d3d9 )
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Direct3DCreate9() - FAILED", nullptr);
 		return false;
@@ -48,7 +46,7 @@ bool d3d::InitD3D(
 		vp = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 
 	// Step 3: Fill out the D3DPRESENT_PARAMETERS structure.
- 
+
 	D3DPRESENT_PARAMETERS d3dpp;
 	d3dpp.BackBufferWidth            = width;
 	d3dpp.BackBufferHeight           = height;
@@ -56,10 +54,10 @@ bool d3d::InitD3D(
 	d3dpp.BackBufferCount            = 1;
 	d3dpp.MultiSampleType            = D3DMULTISAMPLE_NONE;
 	d3dpp.MultiSampleQuality         = 0;
-	d3dpp.SwapEffect                 = D3DSWAPEFFECT_DISCARD; 
+	d3dpp.SwapEffect                 = D3DSWAPEFFECT_DISCARD;
 	d3dpp.hDeviceWindow              = hwnd;
 	d3dpp.Windowed                   = windowed;
-	d3dpp.EnableAutoDepthStencil     = true; 
+	d3dpp.EnableAutoDepthStencil     = true;
 	d3dpp.AutoDepthStencilFormat     = D3DFMT_D24S8;
 	d3dpp.Flags                      = 0;
 	d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
@@ -72,8 +70,8 @@ bool d3d::InitD3D(
 		deviceType,         // device type
 		hwnd,               // window associated with device
 		vp,                 // vertex processing
-	    &d3dpp,             // present parameters
-	    device);            // return created device
+		&d3dpp,             // present parameters
+		device);            // return created device
 
 	if( FAILED(hr) )
 	{
