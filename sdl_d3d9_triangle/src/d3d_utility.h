@@ -26,23 +26,11 @@ namespace d3d
 		D3DDEVTYPE deviceType,     // [in] HAL or REF
 		IDirect3DDevice9** device);// [out]The created device.
 
-	int EnterMsgLoop( 
-		bool (*ptr_display)(float timeDelta));
-
 	template<class T> void Release(T t)
 	{
 		if( t )
 		{
 			t->Release();
-			t = 0;
-		}
-	}
-		
-	template<class T> void Delete(T t)
-	{
-		if( t )
-		{
-			delete t;
 			t = 0;
 		}
 	}

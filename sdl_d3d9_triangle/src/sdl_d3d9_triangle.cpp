@@ -87,7 +87,7 @@ void Cleanup()
 	d3d::Release<IDirect3DVertexBuffer9*>(Triangle);
 }
 
-bool Display(float timeDelta)
+bool Display()
 {
 	if (Device)
 	{
@@ -165,13 +165,26 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 
-	d3d::EnterMsgLoop(Display);
-
-	Cleanup();
-
-	Device->Release();
+	bool running = true;
+	while (running)
+	{
+		SDL_Event ev;
+		while (SDL_PollEvent(&ev))
+		{
+			if ((SDL_QUIT == ev.type) ||
+				(SDL_KEYDOWN == ev.type && SDL_SCANCODE_ESCAPE == ev.key.keysym.scancode))
+			{
+				running = false;
+				break;
+			}
+		}
+		Display();
+	}
 
 	//Cleaning up everything.
+	Cleanup();
+	Device->Release();
 	SDL_Quit();
+
 	return 0;
 }
