@@ -150,8 +150,15 @@ SDL_Window* createWindowContext(std::string title) {
 	//Declaring the variable the return later.
 	SDL_Window* Window = NULL;
 
+	uint32_t flags;
+#ifdef _WIN32
+	flags = SDL_WINDOW_OPENGL;
+#else // for DXVK Native
+	flags = SDL_WINDOW_VULKAN;
+#endif
+
 	//Creating the window and passing that reference to the previously declared variable.
-	Window = SDL_CreateWindow("Hello World!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Width, Height, SDL_WINDOW_OPENGL);
+	Window = SDL_CreateWindow("Hello World!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Width, Height, flags);
 
 	//Returning the newly creted Window context.
 	return Window;
