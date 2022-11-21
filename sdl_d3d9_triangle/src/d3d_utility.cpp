@@ -32,7 +32,7 @@ bool d3d::InitD3D(
 
     if( !d3d9 )
 	{
-		::MessageBox(0, "Direct3DCreate9() - FAILED", 0, 0);
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Direct3DCreate9() - FAILED", nullptr);
 		return false;
 	}
 
@@ -91,7 +91,7 @@ bool d3d::InitD3D(
 		if( FAILED(hr) )
 		{
 			d3d9->Release(); // done with d3d9 object
-			::MessageBox(0, "CreateDevice() - FAILED", 0, 0);
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "CreateDevice() - FAILED", nullptr);
 			return false;
 		}
 	}
