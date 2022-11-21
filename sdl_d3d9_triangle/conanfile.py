@@ -14,5 +14,8 @@ class SdlPure(ConanFile):
         if self.settings.os == "Windows":
             # storm.jfrog.io
             self.requires("directx/9.0@storm/prebuilt")
+        else:
+            # conan-center
+            self.requires("zlib/1.2.13")#fix for error: 'libunwind/1.6.2' requires 'zlib/1.2.12' while 'libxml2/2.9.14' requires 'zlib/1.2.13'
 
     generators = "cmake_multi"

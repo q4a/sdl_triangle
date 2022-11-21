@@ -20,8 +20,8 @@ conan_cmake_run(CONANFILE conanfile.py
 
 if (WIN32)
     # Nothing special
-else() # for DXVK
-    message("Using DXVK-native for D3D9 API")
+else() # for DXVK Native
+    message("Using DXVK Native for D3D9 API")
 
     include(ExternalProject)
     ExternalProject_Add(dxvk-native
@@ -55,7 +55,7 @@ add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES})
 
 if (WIN32)
 set(SYSTEM_DEPS "CONAN_PKG::directx")
-else() # for DXVK
+else() # for DXVK Native
 set(SYSTEM_DEPS "${DXVK_NATIVE_D3D9_LIB}")
 target_include_directories(${PROJECT_NAME} PRIVATE
     "${DXVK_NATIVE_INCLUDE_DIRS}"
