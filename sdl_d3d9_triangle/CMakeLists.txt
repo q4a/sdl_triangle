@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.18)
 project(sdl_d3d9_triangle)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
-include(conan)
+
+option(USE_CONAN "Use Conan build system" OFF)
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "" FORCE)
@@ -13,10 +14,16 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
 
+if (WIN32 OR USE_CONAN)
+include(conan)
 conan_cmake_run(CONANFILE conanfile.py
     BASIC_SETUP CMAKE_TARGETS
     BUILD missing
 )
+set(SDL_DEPS "CONAN_PKG::sdl")
+else()
+set(SDL_DEPS "SDL2")
+endif()
 
 if (WIN32)
     # Nothing special
@@ -64,7 +71,7 @@ endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${SYSTEM_DEPS}
-    CONAN_PKG::sdl
+    ${SDL_DEPS}
 )
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
