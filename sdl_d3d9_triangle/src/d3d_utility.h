@@ -21,7 +21,7 @@ namespace d3d
 {
 	void* OSHandle(SDL_Window* Window);
 	bool InitD3D(
-		HWND hwnd,                 // [in] Window handler
+		SDL_Window* Window,        // [in] SDL Window handler
 		int width, int height,     // [in] Backbuffer dimensions.
 		bool windowed,             // [in] Windowed (true)or full screen (false).
 		D3DDEVTYPE deviceType,     // [in] HAL or REF

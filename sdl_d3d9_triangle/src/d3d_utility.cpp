@@ -13,6 +13,9 @@
 #include "d3d_utility.h"
 
 #include <SDL2/SDL_syswm.h>
+#ifdef USE_NINE
+#include "nine_sdl.h"
+#endif
 
 void* d3d::OSHandle(SDL_Window* Window)
 {
@@ -31,7 +34,7 @@ void* d3d::OSHandle(SDL_Window* Window)
 
 
 bool d3d::InitD3D(
-	HWND hwnd,
+	SDL_Window* Window,
 	int width, int height,
 	bool windowed,
 	D3DDEVTYPE deviceType,
@@ -40,11 +43,16 @@ bool d3d::InitD3D(
 	// Init D3D:
 
 	HRESULT hr = 0;
+	HWND hwnd = static_cast<HWND>(d3d::OSHandle(Window));
 
 	// Step 1: Create the IDirect3D9 object.
 
 	IDirect3D9* d3d9 = 0;
+#ifdef USE_NINE
+	d3d9 = Direct3DCreate9_SDL(Window);
+#else
 	d3d9 = Direct3DCreate9(D3D_SDK_VERSION);
+#endif
 
 	if( !d3d9 )
 	{

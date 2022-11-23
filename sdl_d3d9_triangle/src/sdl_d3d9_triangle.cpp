@@ -171,7 +171,7 @@ int main(int argc, char* argv[]) {
 	//Creating the context for SDL2.
 	SDL_Window* Window = createWindowContext("Hello World!");
 
-	if (!d3d::InitD3D(static_cast<HWND>(d3d::OSHandle(Window)),
+	if (!d3d::InitD3D(Window,
 		Width, Height, true, D3DDEVTYPE_HAL, &Device))
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "InitD3D() - FAILED", nullptr);
