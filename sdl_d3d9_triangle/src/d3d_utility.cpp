@@ -12,6 +12,24 @@
 
 #include "d3d_utility.h"
 
+#include <SDL2/SDL_syswm.h>
+
+void* d3d::OSHandle(SDL_Window* Window)
+{
+	if (!Window)
+		return nullptr;
+
+#ifdef _WIN32
+	SDL_SysWMinfo info;
+	SDL_VERSION(&info.version);
+	SDL_GetWindowWMInfo(Window, &info);
+	return info.info.win.window;
+#else
+	return Window;
+#endif
+}
+
+
 bool d3d::InitD3D(
 	HWND hwnd,
 	int width, int height,

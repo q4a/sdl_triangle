@@ -19,6 +19,7 @@
 
 namespace d3d
 {
+	void* OSHandle(SDL_Window* Window);
 	bool InitD3D(
 		HWND hwnd,                 // [in] Window handler
 		int width, int height,     // [in] Backbuffer dimensions.

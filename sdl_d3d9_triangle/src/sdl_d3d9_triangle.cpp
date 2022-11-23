@@ -3,7 +3,6 @@
 
 #include <string.h>
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_syswm.h>
 
 // Globals
 
@@ -164,21 +163,6 @@ SDL_Window* createWindowContext(std::string title) {
 	return Window;
 }
 
-void* OSHandle(SDL_Window* Window)
-{
-	if (!Window)
-		return nullptr;
-
-#ifdef _WIN32
-	SDL_SysWMinfo info;
-	SDL_VERSION(&info.version);
-	SDL_GetWindowWMInfo(Window, &info);
-	return info.info.win.window;
-#else
-	return Window;
-#endif
-}
-
 // main ... The main function, right now it just calls the initialization of SDL.
 int main(int argc, char* argv[]) {
 	//Calling the SDL init stuff.
@@ -187,7 +171,7 @@ int main(int argc, char* argv[]) {
 	//Creating the context for SDL2.
 	SDL_Window* Window = createWindowContext("Hello World!");
 
-	if (!d3d::InitD3D(static_cast<HWND>(OSHandle(Window)),
+	if (!d3d::InitD3D(static_cast<HWND>(d3d::OSHandle(Window)),
 		Width, Height, true, D3DDEVTYPE_HAL, &Device))
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "InitD3D() - FAILED", nullptr);
