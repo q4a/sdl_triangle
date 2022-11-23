@@ -3,7 +3,10 @@ project(sdl_d3d9_triangle)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 
+if (NOT WIN32)
 option(USE_CONAN "Use Conan build system" OFF)
+option(USE_NINE "Use Gallium Nine for native D3D9 API" OFF)
+endif()
 
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "" FORCE)
@@ -22,11 +25,24 @@ conan_cmake_run(CONANFILE conanfile.py
 )
 set(SDL_DEPS "CONAN_PKG::sdl")
 else()
+#sudo apt install libsdl2-dev
 set(SDL_DEPS "SDL2")
 endif()
 
 if (WIN32)
-    # Nothing special
+    message("Using Windows D3D9 API")
+elseif (USE_NINE) # for Gallium Nine
+    message("Using Gallium Nine for native D3D9 API")
+
+    #sudo apt install libd3dadapter9-mesa-dev
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(D3D REQUIRED IMPORTED_TARGET d3d)
+
+    add_subdirectory(nine-native)
+    set(NINE_NATIVE_INCLUDE_DIRS
+        "${CMAKE_CURRENT_SOURCE_DIR}/nine-native/include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/nine-native/include/D3D9"
+    )
 else() # for DXVK Native
     message("Using DXVK Native for D3D9 API")
 
@@ -52,6 +68,10 @@ endif()
 
 # Source related part
 
+if (USE_NINE)
+    add_definitions(-DUSE_NINE=1)
+endif()
+
 set(SRC_FILES
     "src/d3d_utility.cpp"
     "src/d3d_utility.h"
@@ -61,12 +81,20 @@ set(SRC_FILES
 add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES})
 
 if (WIN32)
-set(SYSTEM_DEPS "CONAN_PKG::directx")
+    set(SYSTEM_DEPS "CONAN_PKG::directx")
+elseif (USE_NINE) # for Gallium Nine
+    set(SYSTEM_DEPS
+        nine-native
+        "PkgConfig::D3D"
+    )
+    target_include_directories(${PROJECT_NAME} PRIVATE
+        "${NINE_NATIVE_INCLUDE_DIRS}"
+    )
 else() # for DXVK Native
-set(SYSTEM_DEPS "${DXVK_NATIVE_D3D9_LIB}")
-target_include_directories(${PROJECT_NAME} PRIVATE
-    "${DXVK_NATIVE_INCLUDE_DIRS}"
-)
+    set(SYSTEM_DEPS "${DXVK_NATIVE_D3D9_LIB}")
+    target_include_directories(${PROJECT_NAME} PRIVATE
+        "${DXVK_NATIVE_INCLUDE_DIRS}"
+    )
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
