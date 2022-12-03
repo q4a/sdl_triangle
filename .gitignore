@@ -1,3 +1,5 @@
+*.dxvk-cache
+*.log
 *.user
 .vs
 build
