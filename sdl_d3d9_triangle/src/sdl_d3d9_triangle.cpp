@@ -150,7 +150,7 @@ SDL_Window* createWindowContext(std::string title) {
 	SDL_Window* Window = NULL;
 
 	uint32_t flags;
-#ifdef _WIN32
+#if defined(_WIN32) || defined(USE_NINE)
 	flags = SDL_WINDOW_OPENGL;
 #else // for DXVK Native
 	flags = SDL_WINDOW_VULKAN;
