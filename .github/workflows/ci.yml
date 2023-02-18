@@ -9,7 +9,7 @@ jobs:
       fail-fast: false
       matrix:
         configuration: [Debug]
-        Platform: [x64]
+        triangle_path: [sdl_d3d9_triangle, sdl_pure_triangle]
     steps:
     - uses: actions/checkout@v2
       with:
@@ -20,11 +20,11 @@ jobs:
     - name: Configure with USE_NINE=ON
       run: |
         export CC=gcc && export CXX=g++
-        mkdir sdl_d3d9_triangle/build && cd sdl_d3d9_triangle/build
-        cmake .. -G Ninja -DUSE_NINE=ON -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }}
+        mkdir ${{ matrix.triangle_path }}/build && cd ${{ matrix.triangle_path }}/build
+        cmake .. -G Ninja -DUSE_NINE=ON -DCMAKE_BUILD_TYPE=${{ matrix.configuration }}
     - name: Build
-      working-directory: sdl_d3d9_triangle/build
+      working-directory: ${{ matrix.triangle_path }}/build
       run: |
         ninja
-        file ./${{ matrix.Configuration }}/sdl_d3d9_triangle
-        ldd ./${{ matrix.Configuration }}/sdl_d3d9_triangle
+        file ./${{ matrix.configuration }}/${{ matrix.triangle_path }}
+        ldd ./${{ matrix.configuration }}/${{ matrix.triangle_path }}
