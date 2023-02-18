@@ -1,0 +1,30 @@
+name: Linux CI
+
+on: [push, pull_request]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug]
+        Platform: [x64]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Install libs
+      run: |
+        sudo apt-get update && sudo apt-get install libsdl2-dev libx11-dev libxcb-present-dev libxcb-dri3-dev libxcb-xfixes0-dev libx11-xcb-dev libdrm-dev libd3dadapter9-mesa-dev ninja-build
+    - name: Configure with USE_NINE=ON
+      run: |
+        export CC=gcc && export CXX=g++
+        mkdir sdl_d3d9_triangle/build && cd sdl_d3d9_triangle/build
+        cmake .. -G Ninja -DUSE_NINE=ON -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }}
+    - name: Build
+      working-directory: sdl_d3d9_triangle/build
+      run: |
+        ninja
+        file ./${{ matrix.Configuration }}/sdl_d3d9_triangle
+        ldd ./${{ matrix.Configuration }}/sdl_d3d9_triangle
