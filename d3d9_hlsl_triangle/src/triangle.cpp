@@ -1,6 +1,11 @@
 
 #include "d3dUtility.h"
 
+#include <fstream>
+#include <filesystem>
+
+#include <d3dcompiler.h>
+
 //
 // Globals
 //
@@ -33,6 +38,35 @@ struct Vertex
     static const uint32_t FVF;
 };
 const uint32_t Vertex::FVF = D3DFVF_XYZ | D3DFVF_DIFFUSE;
+
+bool LoadFile(const char* file_name, char** ppBuffer, uint32_t* dwSize)
+{
+    if (ppBuffer == nullptr)
+        return false;
+
+    std::ifstream fileS(file_name, std::ios::binary);
+    if (!fileS.is_open())
+    {
+        ::MessageBox(0, "Can't open file", 0, 0);
+        return false;
+    }
+    const auto dwLowSize = std::filesystem::file_size(file_name);
+    if (dwSize)
+    {
+        *dwSize = dwLowSize;
+    }
+    if (dwLowSize == 0)
+    {
+        *ppBuffer = nullptr;
+        return false;
+    }
+
+    *ppBuffer = new char[dwLowSize];
+    fileS.exceptions(std::fstream::failbit | std::fstream::badbit);
+    fileS.read(*ppBuffer, dwLowSize);
+    fileS.close();
+    return true;
+}
 
 //
 // Framework Functions
@@ -68,35 +102,31 @@ bool Setup()
     Triangle->Unlock();
 
     //
-    // Compile shader.
+    // Vertex shader
     //
 
     HRESULT hr = 0;
-    ID3DXBuffer* shader = 0;
-    ID3DXBuffer* errorBuffer = 0;
+    ID3DBlob* shader;
+    ID3DBlob* errorMsg;
 
-    hr = D3DXCompileShaderFromFile(
-        // path from build/msvc-.../bin
-        "../../../src/min.vs",
-        0,
-        0,
-        "Main",  // entry point function name
-        "vs_1_1",// shader version to compile to
-        D3DXSHADER_DEBUG | D3DXSHADER_USE_LEGACY_D3DX9_31_DLL,
-        &shader,
-        &errorBuffer,
-        0);
-
-    // output any error messages
-    if (errorBuffer)
+    char* data = nullptr;
+    uint32_t size = 0;
+    if (LoadFile("../../../src/min.vs", &data, &size) == false || !data)
     {
-        ::MessageBox(0, (char*)errorBuffer->GetBufferPointer(), 0, 0);
-        d3d::Release<ID3DXBuffer*>(errorBuffer);
+        ::MessageBox(0, "Can't load VS file", 0, 0);
+        return false;
+    }
+
+    hr = D3DCompile(data, size, nullptr, nullptr, nullptr, "Main", "vs_1_1", 0, 0, &shader, &errorMsg);
+    if (errorMsg)
+    {
+        ::MessageBox(0, (char*)errorMsg->GetBufferPointer(), 0, 0);
+        d3d::Release<ID3DBlob*>(errorMsg);
     }
 
     if (FAILED(hr))
     {
-        ::MessageBox(0, "D3DXCreateEffectFromFile() - FAILED for VS", 0, 0);
+        ::MessageBox(0, "D3DCompile() - FAILED for VS", 0, 0);
         return false;
     }
 
@@ -110,28 +140,29 @@ bool Setup()
         return false;
     }
 
-    hr = D3DXCompileShaderFromFile(
-        // path from build/msvc-.../bin
-        "../../../src/min.ps",
-        0,
-        0,
-        "Main",  // entry point function name
-        "ps_2_0",// shader version to compile to
-        D3DXSHADER_DEBUG | D3DXSHADER_USE_LEGACY_D3DX9_31_DLL,
-        &shader,
-        &errorBuffer,
-        0);
+    //
+    // Pixel shader
+    //
 
-    // output any error messages
-    if (errorBuffer)
+    delete[] data;
+    data = nullptr;
+    size = 0;
+    if (LoadFile("../../../src/min.ps", &data, &size) == false || !data)
     {
-        ::MessageBox(0, (char*)errorBuffer->GetBufferPointer(), 0, 0);
-        d3d::Release<ID3DXBuffer*>(errorBuffer);
+        ::MessageBox(0, "Can't load PS file", 0, 0);
+        return false;
+    }
+
+    hr = D3DCompile(data, size, nullptr, nullptr, nullptr, "Main", "ps_2_0", 0, 0, &shader, &errorMsg);
+    if (errorMsg)
+    {
+        ::MessageBox(0, (char*)errorMsg->GetBufferPointer(), 0, 0);
+        d3d::Release<ID3DBlob*>(errorMsg);
     }
 
     if (FAILED(hr))
     {
-        ::MessageBox(0, "D3DXCreateEffectFromFile() - FAILED for PS", 0, 0);
+        ::MessageBox(0, "D3DCompile() - FAILED for PS", 0, 0);
         return false;
     }
 
@@ -145,7 +176,8 @@ bool Setup()
         return false;
     }
 
-    d3d::Release<ID3DXBuffer*>(shader);
+    delete[] data;
+    d3d::Release<ID3DBlob*>(shader);
 
     return true;
 }

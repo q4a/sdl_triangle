@@ -26,6 +26,12 @@ set(SRC_FILES
     "src/triangle.cpp"
 )
 
+if (MSVC)
+    add_compile_options(/std:c++latest) # for filesystem
+else()
+    add_compile_options(-std=c++20) # for filesystem
+endif()
+
 add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
