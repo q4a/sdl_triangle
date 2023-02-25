@@ -13,7 +13,6 @@ const int Height = 480;
 IDirect3DVertexBuffer9* Triangle = 0;
 IDirect3DVertexShader9* ShaderVS = 0;
 IDirect3DPixelShader9* ShaderPS = 0;
-//ID3DXEffect* g_lpEffect;
 
 //
 // Classes and Structures
@@ -148,47 +147,6 @@ bool Setup()
 
     d3d::Release<ID3DXBuffer*>(shader);
 
-    /*
-    //
-    // Effect
-    //
-    ID3DXBuffer* errorBuffer = 0;
-
-    HRESULT hr = D3DXCreateEffectFromFile(
-            Device,
-            // path from build/msvc-.../bin
-            "../../../src/min-effect.fx",
-            NULL,
-            NULL,
-            D3DXSHADER_ENABLE_BACKWARDS_COMPATIBILITY,
-            NULL,
-            &g_lpEffect,
-            &errorBuffer
-    );
-
-    if (errorBuffer)
-    {
-        ::MessageBox(0, (char*)errorBuffer->GetBufferPointer(), 0, 0);
-        d3d::Release<ID3DXBuffer*>(errorBuffer);
-    }
-
-    if (FAILED(hr))
-    {
-        ::MessageBox(0, "D3DXCreateEffectFromFile() - FAILED", 0, 0);
-        return false;
-    }
-
-    // Choice the tehnique of shader
-    D3DXHANDLE hTechnick;
-    hr = g_lpEffect->FindNextValidTechnique(NULL, &hTechnick);
-    if (FAILED(hr))
-    {
-        ::MessageBox(0, "FindNextValidTechnique] No finded any valid tehnique in shader effect.", 0, 0);
-        return false;
-    }
-    g_lpEffect->SetTechnique(hTechnick);
-    */
-
     return true;
 }
 
@@ -197,7 +155,6 @@ void Cleanup()
     d3d::Release<IDirect3DVertexBuffer9*>(Triangle);
     d3d::Release<IDirect3DVertexShader9*>(ShaderVS);
     d3d::Release<IDirect3DPixelShader9*>(ShaderPS);
-    //d3d::Release<ID3DXEffect*>(g_lpEffect);
 }
 
 bool Display(float timeDelta)
@@ -218,23 +175,6 @@ bool Display(float timeDelta)
         Device->SetVertexShader(ShaderVS);
         Device->SetPixelShader(ShaderPS);
         Device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
-        /*
-        //begin the effect
-        UINT uiPasses = 0;
-        g_lpEffect->Begin(&uiPasses, 0);
-        for (UINT uiPass = 0; uiPass < uiPasses; uiPass++)
-        {
-            //render an effect pass
-            g_lpEffect->BeginPass(uiPass);
-
-            //render the rectangle
-            //Device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
-            Device->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
-
-            g_lpEffect->EndPass();
-        }
-        g_lpEffect->End();
-        */
 
         Device->EndScene();
         Device->Present(0, 0, 0, 0);
