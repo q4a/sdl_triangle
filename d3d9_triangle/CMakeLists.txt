@@ -3,6 +3,10 @@ project(d3d9_triangle)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 include(conan)
+conan_add_remote(NAME storm
+    URL https://storm.jfrog.io/artifactory/api/conan/conan-remote
+    VERIFY_SSL True
+)
 
 ### Set up output paths
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

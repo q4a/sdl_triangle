@@ -19,6 +19,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug
 
 if (WIN32 OR USE_CONAN)
 include(conan)
+### for CONAN_PKG::directx
+conan_add_remote(NAME storm
+    URL https://storm.jfrog.io/artifactory/api/conan/conan-remote
+    VERIFY_SSL True
+)
 conan_cmake_run(CONANFILE conanfile.py
     BASIC_SETUP CMAKE_TARGETS
     BUILD missing
