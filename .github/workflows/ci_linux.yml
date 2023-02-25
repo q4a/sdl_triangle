@@ -3,7 +3,7 @@ name: Linux CI
 on: [push, pull_request]
 
 jobs:
-  build-linux:
+  linux:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
@@ -22,7 +22,7 @@ jobs:
         export CC=gcc && export CXX=g++
         mkdir ${{ matrix.triangle_path }}/build && cd ${{ matrix.triangle_path }}/build
         cmake .. -G Ninja -DUSE_NINE=ON -DCMAKE_BUILD_TYPE=${{ matrix.configuration }}
-    - name: Build
+    - name: Build and check file
       working-directory: ${{ matrix.triangle_path }}/build
       run: |
         ninja
