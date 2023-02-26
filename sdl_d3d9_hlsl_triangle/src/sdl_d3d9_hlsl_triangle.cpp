@@ -100,7 +100,7 @@ bool Setup()
 
 	char* data = nullptr;
 	uint32_t size = 0;
-	if (LoadFile("../../../src/min.vs", &data, &size) == false || !data)
+	if (LoadFile("min.vs", &data, &size) == false || !data)
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Can't load VS file", nullptr);
 		return false;
@@ -134,7 +134,7 @@ bool Setup()
 	delete[] data;
 	data = nullptr;
 	size = 0;
-	if (LoadFile("../../../src/min.ps", &data, &size) == false || !data)
+	if (LoadFile("min.ps", &data, &size) == false || !data)
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Can't load PS file", nullptr);
 		return false;

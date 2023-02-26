@@ -149,4 +149,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${SDL_DEPS}
 )
 
+configure_file(${PROJECT_SOURCE_DIR}/src/min.vs ${PROJECT_BINARY_DIR}/bin/min.vs COPYONLY)
+configure_file(${PROJECT_SOURCE_DIR}/src/min.ps ${PROJECT_BINARY_DIR}/bin/min.ps COPYONLY)
+
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
