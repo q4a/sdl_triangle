@@ -6,7 +6,6 @@
 #include <fstream>
 
 #include <SDL2/SDL.h>
-#include <d3dcompiler.h>
 
 // Globals
 

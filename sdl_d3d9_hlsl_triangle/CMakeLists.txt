@@ -35,8 +35,37 @@ set(SDL_DEPS "SDL2")
 endif()
 
 if (WIN32)
-    message("Using Windows D3D9 API")
-elseif (USE_NINE) # for Gallium Nine
+message("Using Windows D3D9 API")
+else()
+
+include(ProcessorCount)
+ProcessorCount(N)
+message("ProcessorCount = ${N}")
+
+set(VKD3D_CONFIG "./configure")
+list(APPEND VKD3D_CONFIG "CPPFLAGS=-O3 -DNDEBUG -DVKD3D_NO_TRACE_MESSAGES")
+list(APPEND VKD3D_CONFIG   "CFLAGS=-O3 -DNDEBUG -DVKD3D_NO_TRACE_MESSAGES")
+
+include(ExternalProject)
+ExternalProject_Add(vkd3d
+    GIT_REPOSITORY    https://gitlab.winehq.org/wine/vkd3d.git
+    GIT_TAG           b1e13d6e33dd2be6a4b127d6c75fd088c5d6edee
+    GIT_SHALLOW       ON
+    BUILD_ALWAYS      OFF
+    BUILD_IN_SOURCE   ON
+    CONFIGURE_HANDLED_BY_BUILD ON
+    # result comman will be: ./configure "CPPFLAGS=-O3 -DNDEBUG -DVKD3D_NO_TRACE_MESSAGES" "CFLAGS=-O3 -DNDEBUG -DVKD3D_NO_TRACE_MESSAGES"
+    CONFIGURE_COMMAND ./autogen.sh && ${CMAKE_COMMAND} -E env ${VKD3D_CONFIG}
+    BUILD_COMMAND     make -j${N}
+    INSTALL_COMMAND   ""
+)
+ExternalProject_Get_property(vkd3d SOURCE_DIR BINARY_DIR)
+set(VKD3D_INCLUDE_DIRS
+    "${SOURCE_DIR}/include"
+)
+set(VKD3D_LIB ${BINARY_DIR}/.libs/libvkd3d-utils.so)
+
+if (USE_NINE) # for Gallium Nine
     message("Using Gallium Nine for native D3D9 API")
 
     #sudo apt install libd3dadapter9-mesa-dev
@@ -48,13 +77,13 @@ elseif (USE_NINE) # for Gallium Nine
         "${CMAKE_CURRENT_SOURCE_DIR}/nine-native/include"
         "${CMAKE_CURRENT_SOURCE_DIR}/nine-native/include/D3D9"
     )
+    ADD_CUSTOM_TARGET(dependencies ALL DEPENDS vkd3d)
 else() # for DXVK Native
     message("Using DXVK Native for D3D9 API")
 
-    include(ExternalProject)
     ExternalProject_Add(dxvk-native
-        GIT_REPOSITORY    https://github.com/IonAgorria/dxvk-native
-        GIT_TAG           2e91e784a86bc1355100518cd90eee48433551ac
+        GIT_REPOSITORY    https://github.com/q4a/dxvk-native
+        GIT_TAG           44c054faf76ce90578dee79a955e8aefa7356368
         GIT_SHALLOW       ON
         BUILD_ALWAYS      OFF
         CONFIGURE_HANDLED_BY_BUILD ON
@@ -68,8 +97,9 @@ else() # for DXVK Native
         "${SOURCE_DIR}/include/native/windows"
     )
     set(DXVK_NATIVE_D3D9_LIB ${BINARY_DIR}/src/d3d9/libdxvk_d3d9.so)
-    ADD_CUSTOM_TARGET(dependencies ALL DEPENDS dxvk-native)
+    ADD_CUSTOM_TARGET(dependencies ALL DEPENDS vkd3d dxvk-native)
 endif()
+endif() # WIN32
 
 # Source related part
 
@@ -95,15 +125,21 @@ if (WIN32)
     set(SYSTEM_DEPS "CONAN_PKG::directx")
 elseif (USE_NINE) # for Gallium Nine
     set(SYSTEM_DEPS
+        "${VKD3D_LIB}"
         nine-native
         "PkgConfig::D3D"
     )
     target_include_directories(${PROJECT_NAME} PRIVATE
+        "${VKD3D_INCLUDE_DIRS}"
         "${NINE_NATIVE_INCLUDE_DIRS}"
     )
 else() # for DXVK Native
-    set(SYSTEM_DEPS "${DXVK_NATIVE_D3D9_LIB}")
+    set(SYSTEM_DEPS
+        "${VKD3D_LIB}"
+        "${DXVK_NATIVE_D3D9_LIB}"
+    )
     target_include_directories(${PROJECT_NAME} PRIVATE
+        "${VKD3D_INCLUDE_DIRS}"
         "${DXVK_NATIVE_INCLUDE_DIRS}"
     )
 endif()
