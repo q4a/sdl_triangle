@@ -1,0 +1,5 @@
+//Pixel Shader
+float4 Main(float4 Color : COLOR) : COLOR
+{
+    return Color;
+}
