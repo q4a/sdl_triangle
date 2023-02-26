@@ -43,10 +43,10 @@ elseif (USE_NINE) # for Gallium Nine
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(D3D REQUIRED IMPORTED_TARGET d3d)
 
-    add_subdirectory(nine-native)
+    add_subdirectory(../nine-native nine-native)
     set(NINE_NATIVE_INCLUDE_DIRS
-        "${CMAKE_CURRENT_SOURCE_DIR}/nine-native/include"
-        "${CMAKE_CURRENT_SOURCE_DIR}/nine-native/include/D3D9"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../nine-native/include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../nine-native/include/D3D9"
     )
 else() # for DXVK Native
     message("Using DXVK Native for D3D9 API")

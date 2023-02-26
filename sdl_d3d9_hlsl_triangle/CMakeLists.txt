@@ -5,7 +5,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 
 if (NOT WIN32)
 option(USE_CONAN "Use Conan build system" OFF)
-option(USE_NINE "Use Gallium Nine for native D3D9 API" OFF)
+option(USE_NINE "Use Gallium Nine for native D3D9 API" ON)
 endif()
 
 if (NOT CMAKE_BUILD_TYPE)
@@ -72,10 +72,10 @@ if (USE_NINE) # for Gallium Nine
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(D3D REQUIRED IMPORTED_TARGET d3d)
 
-    add_subdirectory(nine-native)
+    add_subdirectory(../nine-native nine-native)
     set(NINE_NATIVE_INCLUDE_DIRS
-        "${CMAKE_CURRENT_SOURCE_DIR}/nine-native/include"
-        "${CMAKE_CURRENT_SOURCE_DIR}/nine-native/include/D3D9"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../nine-native/include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../nine-native/include/D3D9"
     )
     ADD_CUSTOM_TARGET(dependencies ALL DEPENDS vkd3d)
 else() # for DXVK Native
