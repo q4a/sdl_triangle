@@ -16,9 +16,7 @@
 #ifdef _WIN32
 #include <d3dcompiler.h>
 #else
-#define __VKD3D_WINDOWS_H
-#define __VKD3D_UNKNOWN_H
-#include <vkd3d_utils.h>
+#include "vkd3d_hlsl.h"
 #endif
 #include <d3d9.h>
 #include <SDL2/SDL.h>
