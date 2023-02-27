@@ -69,7 +69,7 @@ bool LoadFile(const char* file_name, char** ppBuffer, uint32_t* dwSize)
 
 // Framework Functions
 
-bool Setup()
+bool Setup(const std::string &shFolder)
 {
 	// Create the vertex buffer.
 
@@ -100,7 +100,8 @@ bool Setup()
 
 	char* data = nullptr;
 	uint32_t size = 0;
-	if (LoadFile("shaders/hlsl/min_vs.hlsl", &data, &size) == false || !data)
+	std::string shPath = "shaders/" + shFolder + "/min_vs." + shFolder;
+	if (LoadFile(shPath.c_str(), &data, &size) == false || !data)
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Can't load VS file", nullptr);
 		return false;
@@ -134,7 +135,8 @@ bool Setup()
 	delete[] data;
 	data = nullptr;
 	size = 0;
-	if (LoadFile("shaders/hlsl/min_ps.hlsl", &data, &size) == false || !data)
+	shPath = "shaders/" + shFolder + "/min_ps." + shFolder;
+	if (LoadFile(shPath.c_str(), &data, &size) == false || !data)
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Can't load PS file", nullptr);
 		return false;
@@ -225,6 +227,14 @@ SDL_Window* createWindowContext(std::string title) {
 
 // main ... The main function, right now it just calls the initialization of SDL.
 int main(int argc, char* argv[]) {
+
+	// You can add this line to launch.vs.json: "args": [ "fxc"],
+	std::string shFolder;
+	if (argc == 2)
+		shFolder = argv[1];
+	else
+		shFolder = "hlsl";
+
 	//Calling the SDL init stuff.
 	initSDL();
 
@@ -238,7 +248,7 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 
-	if (!Setup())
+	if (!Setup(shFolder))
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Setup() - FAILED", nullptr);
 		return 0;
