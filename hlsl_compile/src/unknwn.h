@@ -2,6 +2,9 @@
 
 #include "windows_base.h"
 
+#ifndef __IUnknown_INTERFACE_DEFINED__
+#define __IUnknown_INTERFACE_DEFINED__
+
 typedef interface IUnknown IUnknown;
 
 DEFINE_GUID(IID_IUnknown, 0x00000000,0x0000,0x0000,0xC0,0x00,0x00,0x00,0x00,0x00,0x00,0x46)
@@ -42,6 +45,7 @@ interface IUnknown
 #define IUnknown_Release(This) ((This)->lpVtbl->Release(This))
 
 #endif // __cplusplus
+#endif
 
 DECLARE_UUIDOF_HELPER(IUnknown, 0x00000000,0x0000,0x0000,0xC0,0x00,0x00,0x00,0x00,0x00,0x00,0x46)
 

@@ -177,8 +177,20 @@ typedef struct RGNDATA {
 } RGNDATA;
 
 // Ignore these.
-#define STDMETHODCALLTYPE
-#define __stdcall
+//#define WINAPI
+//#define STDMETHODCALLTYPE
+//#define __stdcall
+# ifdef __x86_64__
+#  define __stdcall __attribute__((ms_abi))
+# else
+#  if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2)) || defined(__APPLE__)
+#   define __stdcall __attribute__((__stdcall__)) __attribute__((__force_align_arg_pointer__))
+#  else
+#   define __stdcall __attribute__((__stdcall__))
+#  endif
+# endif
+# define WINAPI __stdcall
+# define STDMETHODCALLTYPE __stdcall
 
 #define CONST const
 #define CONST_VTBL const
@@ -256,7 +268,6 @@ typedef struct RGNDATA {
 
 #define D3DENUM_WHQL_LEVEL 2
 
-#define WINAPI
 #define WINUSERAPI
 
 #define RGB(r,g,b)          ((COLORREF)(((BYTE)(r)|((WORD)((BYTE)(g))<<8))|(((DWORD)(BYTE)(b))<<16)))

@@ -1,5 +1,5 @@
 
-#include <vkd3d_windows.h>
+#include "windows_base.h"
 #include <vkd3d_types.h>
 
 //
