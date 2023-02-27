@@ -3,8 +3,8 @@
 #include <d3dcompiler.h>
 #else
 #define NOMINMAX
-#include <vkd3d_utils.h>
-#endif
+#include "vkd3d_hlsl.h"
+#endif // _WIN32
 
 #include <cstring>
 #include <filesystem>
