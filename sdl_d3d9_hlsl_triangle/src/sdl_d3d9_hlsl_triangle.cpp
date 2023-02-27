@@ -110,7 +110,7 @@ bool Setup()
 	if (errorMsg)
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", (char*)errorMsg->GetBufferPointer(), nullptr);
-		d3d::Release<ID3DBlob*>(errorMsg);
+		errorMsg->Release();
 	}
 
 	if (FAILED(hr))
@@ -144,7 +144,7 @@ bool Setup()
 	if (errorMsg)
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", (char*)errorMsg->GetBufferPointer(), nullptr);
-		d3d::Release<ID3DBlob*>(errorMsg);
+		errorMsg->Release();
 	}
 
 	if (FAILED(hr))
@@ -164,16 +164,16 @@ bool Setup()
 	}
 
 	delete[] data;
-	d3d::Release<ID3DBlob*>(shader);
+	shader->Release();
 
 	return true;
 }
 
 void Cleanup()
 {
-	d3d::Release<IDirect3DVertexBuffer9*>(Triangle);
-	d3d::Release<IDirect3DVertexShader9*>(ShaderVS);
-	d3d::Release<IDirect3DPixelShader9*>(ShaderPS);
+	Triangle->Release();
+	ShaderVS->Release();
+	ShaderPS->Release();
 }
 
 void ShowPrimitive()
