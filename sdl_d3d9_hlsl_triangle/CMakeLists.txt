@@ -149,7 +149,22 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${SDL_DEPS}
 )
 
-configure_file(${PROJECT_SOURCE_DIR}/src/min.vs ${PROJECT_BINARY_DIR}/bin/min.vs COPYONLY)
-configure_file(${PROJECT_SOURCE_DIR}/src/min.ps ${PROJECT_BINARY_DIR}/bin/min.ps COPYONLY)
+macro(configure_files srcDir destDir)
+    message(STATUS "Configuring directory ${destDir}")
+    make_directory(${destDir})
+
+    file(GLOB_RECURSE templateFiles RELATIVE ${srcDir} "${srcDir}/*")
+    foreach(templateFile ${templateFiles})
+        set(srcTemplatePath ${srcDir}/${templateFile})
+        if(NOT IS_DIRECTORY ${srcTemplatePath})
+            message(STATUS "Configuring file ${templateFile}")
+            configure_file(
+                    ${srcTemplatePath}
+                    ${destDir}/${templateFile}
+                    COPYONLY)
+        endif(NOT IS_DIRECTORY ${srcTemplatePath})
+    endforeach(templateFile)
+endmacro(configure_files)
+configure_files(${PROJECT_SOURCE_DIR}/shaders ${PROJECT_BINARY_DIR}/bin/shaders)
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
