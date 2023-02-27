@@ -25,6 +25,7 @@ VS_OUTPUT main(VSInputTxVc VertexIn)
     {
         VertexOut.Color = float4(0,0,1,1); // Bottom half-part must have blue
     }
+    //VertexOut.Color = VertexIn.Color;
 
     return VertexOut;
 }

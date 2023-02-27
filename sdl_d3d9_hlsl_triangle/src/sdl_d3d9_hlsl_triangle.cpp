@@ -9,6 +9,7 @@
 
 // Globals
 
+#define hlslFolder "hlsl"
 IDirect3DDevice9* Device = 0;
 const int Width = 640;
 const int Height = 480;
@@ -107,22 +108,31 @@ bool Setup(const std::string &shFolder)
 		return false;
 	}
 
-	hr = D3DCompile(data, size, nullptr, nullptr, nullptr, "main", "vs_1_1", 0, 0, &shader, &errorMsg);
-	if (errorMsg)
+	if (!shFolder.compare(hlslFolder))
 	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", (char*)errorMsg->GetBufferPointer(), nullptr);
-		errorMsg->Release();
-	}
+		hr = D3DCompile(data, size, nullptr, nullptr, nullptr, "main", "vs_1_1", 0, 0, &shader, &errorMsg);
+		if (errorMsg)
+		{
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", (char*)errorMsg->GetBufferPointer(), nullptr);
+			errorMsg->Release();
+		}
 
-	if (FAILED(hr))
+		if (FAILED(hr))
+		{
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "D3DCompile() - FAILED for VS", nullptr);
+			return false;
+		}
+
+		hr = Device->CreateVertexShader(
+			(DWORD*)shader->GetBufferPointer(),
+			&ShaderVS);
+	}
+	else
 	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "D3DCompile() - FAILED for VS", nullptr);
-		return false;
+		hr = Device->CreateVertexShader(
+			(DWORD*)data,
+			&ShaderVS);
 	}
-
-	hr = Device->CreateVertexShader(
-		(DWORD*)shader->GetBufferPointer(),
-		&ShaderVS);
 
 	if (FAILED(hr))
 	{
@@ -142,22 +152,31 @@ bool Setup(const std::string &shFolder)
 		return false;
 	}
 
-	hr = D3DCompile(data, size, nullptr, nullptr, nullptr, "main", "ps_2_0", 0, 0, &shader, &errorMsg);
-	if (errorMsg)
+	if (!shFolder.compare(hlslFolder))
 	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", (char*)errorMsg->GetBufferPointer(), nullptr);
-		errorMsg->Release();
-	}
+		hr = D3DCompile(data, size, nullptr, nullptr, nullptr, "main", "ps_2_0", 0, 0, &shader, &errorMsg);
+		if (errorMsg)
+		{
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", (char*)errorMsg->GetBufferPointer(), nullptr);
+			errorMsg->Release();
+		}
 
-	if (FAILED(hr))
+		if (FAILED(hr))
+		{
+			SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "D3DCompile() - FAILED for PS", nullptr);
+			return false;
+		}
+
+		hr = Device->CreatePixelShader(
+			(DWORD*)shader->GetBufferPointer(),
+			&ShaderPS);
+	}
+	else
 	{
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "D3DCompile() - FAILED for PS", nullptr);
-		return false;
+		hr = Device->CreatePixelShader(
+			(DWORD*)data,
+			&ShaderPS);
 	}
-
-	hr = Device->CreatePixelShader(
-		(DWORD*)shader->GetBufferPointer(),
-		&ShaderPS);
 
 	if (FAILED(hr))
 	{
@@ -166,7 +185,10 @@ bool Setup(const std::string &shFolder)
 	}
 
 	delete[] data;
-	shader->Release();
+	if (!shFolder.compare(hlslFolder))
+	{
+		shader->Release();
+	}
 
 	return true;
 }
@@ -233,7 +255,7 @@ int main(int argc, char* argv[]) {
 	if (argc == 2)
 		shFolder = argv[1];
 	else
-		shFolder = "hlsl";
+		shFolder = hlslFolder;
 
 	//Calling the SDL init stuff.
 	initSDL();
