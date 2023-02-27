@@ -1,5 +1,5 @@
 //Pixel Shader
-float4 Main(float4 Color : COLOR) : COLOR
+float4 main(float4 Color : COLOR) : COLOR
 {
     return Color;
 }

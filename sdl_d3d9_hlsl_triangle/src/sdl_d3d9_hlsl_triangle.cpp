@@ -106,7 +106,7 @@ bool Setup()
 		return false;
 	}
 
-	hr = D3DCompile(data, size, nullptr, nullptr, nullptr, "Main", "vs_1_1", 0, 0, &shader, &errorMsg);
+	hr = D3DCompile(data, size, nullptr, nullptr, nullptr, "main", "vs_1_1", 0, 0, &shader, &errorMsg);
 	if (errorMsg)
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", (char*)errorMsg->GetBufferPointer(), nullptr);
@@ -140,7 +140,7 @@ bool Setup()
 		return false;
 	}
 
-	hr = D3DCompile(data, size, nullptr, nullptr, nullptr, "Main", "ps_2_0", 0, 0, &shader, &errorMsg);
+	hr = D3DCompile(data, size, nullptr, nullptr, nullptr, "main", "ps_2_0", 0, 0, &shader, &errorMsg);
 	if (errorMsg)
 	{
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", (char*)errorMsg->GetBufferPointer(), nullptr);

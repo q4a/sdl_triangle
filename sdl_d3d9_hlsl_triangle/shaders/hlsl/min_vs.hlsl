@@ -12,7 +12,7 @@ struct VS_OUTPUT
 };
 
 //Vertex Shader
-VS_OUTPUT Main(VSInputTxVc VertexIn)
+VS_OUTPUT main(VSInputTxVc VertexIn)
 {
     VS_OUTPUT VertexOut;
     VertexOut.Position = VertexIn.Position;
