@@ -1,38 +1,10 @@
 
-#include "windows_base.h"
+#include "windows.h"
 #include <vkd3d_types.h>
 
 //
 ////////////////////////////// vkd3d_d3dcommon.h //////////////////////////////
 //
-
-#ifndef __IUnknown_INTERFACE_DEFINED__
-#define __IUnknown_INTERFACE_DEFINED__
-
-DEFINE_GUID(IID_IUnknown, 0x00000000, 0x0000, 0x0000, 0xc0,0x00, 0x00,0x00,0x00,0x00,0x00,0x46);
-#if defined(__cplusplus) && !defined(CINTERFACE)
-MIDL_INTERFACE("00000000-0000-0000-c000-000000000046")
-IUnknown
-{
-
-	BEGIN_INTERFACE
-
-		virtual HRESULT STDMETHODCALLTYPE QueryInterface(
-			REFIID riid,
-			void **object) = 0;
-
-	virtual ULONG STDMETHODCALLTYPE AddRef(
-		) = 0;
-
-	virtual ULONG STDMETHODCALLTYPE Release(
-		) = 0;
-
-	END_INTERFACE
-
-};
-__CRT_UUID_DECL(IUnknown, 0x00000000, 0x0000, 0x0000, 0xc0,0x00, 0x00,0x00,0x00,0x00,0x00,0x46)
-#endif
-#endif
 
 #ifndef __ID3D10Blob_INTERFACE_DEFINED__
 #define __ID3D10Blob_INTERFACE_DEFINED__
