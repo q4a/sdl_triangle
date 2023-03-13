@@ -34,44 +34,7 @@ else()
 set(SDL_DEPS "SDL2")
 endif()
 
-if (WIN32)
-    message("Using Windows D3D9 API")
-elseif (USE_NINE) # for Gallium Nine
-    message("Using Gallium Nine for native D3D9 API")
-
-    #sudo apt install libd3dadapter9-mesa-dev
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(D3D REQUIRED IMPORTED_TARGET d3d)
-
-    add_subdirectory(../nine-native nine-native)
-    set(NINE_NATIVE_INCLUDE_DIRS
-        "${CMAKE_CURRENT_SOURCE_DIR}/../nine-native/include"
-        "${CMAKE_CURRENT_SOURCE_DIR}/../nine-native/include/D3D9"
-    )
-else() # for DXVK Native
-    message("Using DXVK Native for D3D9 API")
-
-    include(ExternalProject)
-    ExternalProject_Add(dxvk-native
-        GIT_REPOSITORY    https://github.com/IonAgorria/dxvk-native
-        GIT_TAG           2e91e784a86bc1355100518cd90eee48433551ac
-        GIT_SHALLOW       ON
-        BUILD_ALWAYS      OFF
-        CONFIGURE_HANDLED_BY_BUILD ON
-        CONFIGURE_COMMAND meson ../dxvk-native
-        BUILD_COMMAND     ninja
-        INSTALL_COMMAND   ""
-    )
-    ExternalProject_Get_property(dxvk-native SOURCE_DIR BINARY_DIR)
-    set(DXVK_NATIVE_INCLUDE_DIRS
-        "${SOURCE_DIR}/include/native/directx"
-        "${SOURCE_DIR}/include/native/windows"
-    )
-    set(DXVK_NATIVE_D3D9_LIB ${BINARY_DIR}/src/d3d9/libdxvk_d3d9.so)
-    ADD_CUSTOM_TARGET(dependencies ALL DEPENDS dxvk-native)
-endif()
-
-# Source related part
+# Source files
 
 if (USE_NINE)
     add_definitions(-DUSE_NINE=1)
@@ -85,17 +48,71 @@ set(SRC_FILES
 
 add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES})
 
+# Dependencies
+
 if (WIN32)
+    message("Using Windows D3D9 API")
     set(SYSTEM_DEPS "CONAN_PKG::directx")
 elseif (USE_NINE) # for Gallium Nine
+    message("Using Gallium Nine for native D3D9 API")
+
+    #sudo apt install libd3dadapter9-mesa-dev
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(D3D REQUIRED IMPORTED_TARGET d3d)
+
+    include(ExternalProject)
+    ExternalProject_Add(nine-native
+        GIT_REPOSITORY    https://github.com/q4a/nine-native
+        GIT_TAG           main
+        GIT_SHALLOW       ON
+        BUILD_ALWAYS      OFF
+        BUILD_BYPRODUCTS  <BINARY_DIR>/libnine-native.a
+        INSTALL_COMMAND   ""
+    )
+    ExternalProject_Get_property(nine-native SOURCE_DIR BINARY_DIR)
+    set(NINE_NATIVE_INCLUDE_DIRS
+        "${SOURCE_DIR}/include"
+        "${SOURCE_DIR}/include/D3D9"
+    )
+    set(NINE_NATIVE_D3D9_LIB ${BINARY_DIR}/libnine-native.a)
+    add_dependencies(${PROJECT_NAME} nine-native)
+
     set(SYSTEM_DEPS
-        nine-native
+        "${NINE_NATIVE_D3D9_LIB}"
         "PkgConfig::D3D"
+        X11
+        xcb
+        xcb-present
+        xcb-dri3
+        xcb-xfixes
+        X11-xcb
     )
     target_include_directories(${PROJECT_NAME} PRIVATE
         "${NINE_NATIVE_INCLUDE_DIRS}"
     )
 else() # for DXVK Native
+    message("Using DXVK Native for D3D9 API")
+
+    include(ExternalProject)
+    ExternalProject_Add(dxvk-native
+        GIT_REPOSITORY    https://github.com/IonAgorria/dxvk-native
+        GIT_TAG           2e91e784a86bc1355100518cd90eee48433551ac
+        GIT_SHALLOW       ON
+        BUILD_ALWAYS      OFF
+        CONFIGURE_HANDLED_BY_BUILD ON
+        CONFIGURE_COMMAND meson setup ../dxvk-native --buildtype=release -Denable_d3d11=false -Denable_d3d10=false -Denable_dxgi=false
+        BUILD_COMMAND     ninja
+        BUILD_BYPRODUCTS  <BINARY_DIR>/src/d3d9/libdxvk_d3d9.so
+        INSTALL_COMMAND   ""
+    )
+    ExternalProject_Get_property(dxvk-native SOURCE_DIR BINARY_DIR)
+    set(DXVK_NATIVE_INCLUDE_DIRS
+        "${SOURCE_DIR}/include/native/directx"
+        "${SOURCE_DIR}/include/native/windows"
+    )
+    set(DXVK_NATIVE_D3D9_LIB ${BINARY_DIR}/src/d3d9/libdxvk_d3d9.so)
+    add_dependencies(${PROJECT_NAME} dxvk-native)
+
     set(SYSTEM_DEPS "${DXVK_NATIVE_D3D9_LIB}")
     target_include_directories(${PROJECT_NAME} PRIVATE
         "${DXVK_NATIVE_INCLUDE_DIRS}"
