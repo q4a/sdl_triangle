@@ -52,7 +52,7 @@ add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES})
 
 if (WIN32)
     message("Using Windows D3D9 API")
-    set(SYSTEM_DEPS "CONAN_PKG::directx")
+    set(NATIVE_D3D9_LIBS "CONAN_PKG::directx")
 elseif (USE_NINE) # for Gallium Nine
     message("Using Gallium Nine for native D3D9 API")
 
@@ -73,12 +73,10 @@ elseif (USE_NINE) # for Gallium Nine
     set(NINE_NATIVE_INCLUDE_DIRS
         "${SOURCE_DIR}/include"
         "${SOURCE_DIR}/include/D3D9"
+        "${SOURCE_DIR}/include/windows"
     )
-    set(NINE_NATIVE_D3D9_LIB ${BINARY_DIR}/libnine-native.a)
-    add_dependencies(${PROJECT_NAME} nine-native)
-
-    set(SYSTEM_DEPS
-        "${NINE_NATIVE_D3D9_LIB}"
+    set(NATIVE_D3D9_LIBS
+        "${BINARY_DIR}/libnine-native.a"
         "PkgConfig::D3D"
         X11
         xcb
@@ -90,13 +88,14 @@ elseif (USE_NINE) # for Gallium Nine
     target_include_directories(${PROJECT_NAME} PRIVATE
         "${NINE_NATIVE_INCLUDE_DIRS}"
     )
+    add_dependencies(${PROJECT_NAME} nine-native)
 else() # for DXVK Native
     message("Using DXVK Native for D3D9 API")
 
     include(ExternalProject)
     ExternalProject_Add(dxvk-native
-        GIT_REPOSITORY    https://github.com/IonAgorria/dxvk-native
-        GIT_TAG           2e91e784a86bc1355100518cd90eee48433551ac
+        GIT_REPOSITORY    https://github.com/q4a/dxvk-native
+        GIT_TAG           master
         GIT_SHALLOW       ON
         BUILD_ALWAYS      OFF
         CONFIGURE_HANDLED_BY_BUILD ON
@@ -110,17 +109,15 @@ else() # for DXVK Native
         "${SOURCE_DIR}/include/native/directx"
         "${SOURCE_DIR}/include/native/windows"
     )
-    set(DXVK_NATIVE_D3D9_LIB ${BINARY_DIR}/src/d3d9/libdxvk_d3d9.so)
-    add_dependencies(${PROJECT_NAME} dxvk-native)
-
-    set(SYSTEM_DEPS "${DXVK_NATIVE_D3D9_LIB}")
+    set(NATIVE_D3D9_LIBS ${BINARY_DIR}/src/d3d9/libdxvk_d3d9.so)
     target_include_directories(${PROJECT_NAME} PRIVATE
         "${DXVK_NATIVE_INCLUDE_DIRS}"
     )
+    add_dependencies(${PROJECT_NAME} dxvk-native)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    ${SYSTEM_DEPS}
+    ${NATIVE_D3D9_LIBS}
     ${SDL_DEPS}
 )
 
