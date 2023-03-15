@@ -36,10 +36,6 @@ jobs:
         export CC=gcc && export CXX=g++
         mkdir ${{ matrix.triangle_path }}/build && cd ${{ matrix.triangle_path }}/build
         cmake .. -G Ninja -DUSE_NINE=${{ matrix.nine }} -DCMAKE_BUILD_TYPE=${{ matrix.configuration }}
-    - name: Build dependencies
-      if: ${{ matrix.triangle_path == 'sdl_d3d9_hlsl_triangle' || matrix.nine == 'OFF' }}
-      working-directory: ${{ matrix.triangle_path }}/build
-      run: ninja dependencies
     - name: Build and check file
       working-directory: ${{ matrix.triangle_path }}/build
       run: |
