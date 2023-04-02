@@ -156,6 +156,7 @@ static IDirect3DDevice9* create_device(IDirect3D9* d3d, HWND device_window, HWND
 // main ... The main function, right now it just calls the initialization of SDL.
 int main(int argc, char* argv[]) {
 	
+	float start = 0.0f, end = 1.0f;
 	HRESULT hr;
 	IDirect3DDevice9* device;
 	IDirect3D9* d3d;
@@ -181,19 +182,11 @@ int main(int argc, char* argv[]) {
 	// near plane: 1, far plane: 101
 	static const D3DMATRIX proj =
 	{{{
-		1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f
-	}}};
-	/*
-	{{{
 		0.75f, 0.0f,  0.0f,  0.0f,
 		0.0f,  1.0f,  0.0f,  0.0f,
 		0.0f,  0.0f,  1.01f, 1.0f,
 		0.0f,  0.0f, -1.01f, 0.0f
 	}}};
-	*/
 	static const struct
 	{
 		float z, w;
@@ -202,14 +195,14 @@ int main(int argc, char* argv[]) {
 	}
 	tests[] =
 	{
-		{0.7f,  0.0f, D3DZB_TRUE,  0x004cb200},
-		{0.7f,  0.0f, D3DZB_FALSE, 0x004cb200},
-		{0.7f,  0.3f, D3DZB_TRUE,  0x004cb200},
-		{0.7f,  0.3f, D3DZB_FALSE, 0x004cb200},
-		{0.7f,  3.0f, D3DZB_TRUE,  0x004cb200},
-		{0.7f,  3.0f, D3DZB_FALSE, 0x004cb200},
-		{0.3f,  0.0f, D3DZB_TRUE,  0x00b24c00},
-		{0.3f,  0.0f, D3DZB_FALSE, 0x00b24c00},
+		{0.7f,  0.0f, D3DZB_TRUE,  0x0000ff00},
+		{0.7f,  0.0f, D3DZB_FALSE, 0x0000ff00},
+		{0.7f,  0.3f, D3DZB_TRUE,  0x0000ff00},
+		{0.7f,  0.3f, D3DZB_FALSE, 0x0000ff00},
+		{0.7f,  3.0f, D3DZB_TRUE,  0x00aa5500},
+		{0.7f,  3.0f, D3DZB_FALSE, 0x00aa5500},
+		{0.3f,  0.0f, D3DZB_TRUE,  0x0000ff00},
+		{0.3f,  0.0f, D3DZB_FALSE, 0x0000ff00},
 	};
 	unsigned int i;
 
@@ -239,9 +232,9 @@ int main(int argc, char* argv[]) {
 	ok(SUCCEEDED(hr), "Failed to set render state, hr %#x.\n", hr);
 	hr = IDirect3DDevice9_SetRenderState(device, D3DRS_FOGCOLOR, 0x0000ff00);
 	ok(SUCCEEDED(hr), "Failed to set render state, hr %#x.\n", hr);
-	hr = IDirect3DDevice9_SetRenderState(device, D3DRS_FOGSTART, 0);
+	hr = IDirect3DDevice9_SetRenderState(device, D3DRS_FOGSTART, *(DWORD*)(&start));
 	ok(SUCCEEDED(hr), "Failed to set render state, hr %#x.\n", hr);
-	hr = IDirect3DDevice9_SetRenderState(device, D3DRS_FOGEND, 1);
+	hr = IDirect3DDevice9_SetRenderState(device, D3DRS_FOGEND, *(DWORD*)(&end));
 	ok(SUCCEEDED(hr), "Failed to set render state, hr %#x.\n", hr);
 	hr = IDirect3DDevice9_SetRenderState(device, D3DRS_CLIPPING, FALSE);
 	ok(SUCCEEDED(hr), "SetRenderState failed, hr %#x.\n", hr);
@@ -268,7 +261,6 @@ int main(int argc, char* argv[]) {
 			float timeDelta = (currTime - lastTime) * 0.001f;
 
 	
-	//for (i = 0; i < 1; ++i)
 	for (i = 0; i < ARRAY_SIZE(tests); ++i)
 	{
 		hr = IDirect3DDevice9_Clear(device, 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x000000ff, 1.0f, 0);
@@ -302,7 +294,6 @@ int main(int argc, char* argv[]) {
 			lastTime = currTime;
 		}
 	}
-
 
 done:
 	refcount = IDirect3DDevice9_Release(device);
