@@ -171,38 +171,69 @@ int main(int argc, char* argv[]) {
 	}
 	quad[] =
 	{
-		{{ 40.0f,  40.0f, 0.1f, 0.6f}, 0xffff0000},
-		{{600.0f,  40.0f, 0.2f, 0.7f}, 0xffff0000},
-		{{ 40.0f, 440.0f, 0.3f, 0.8f}, 0xffff0000},
-		{{600.0f, 440.0f, 0.4f, 0.9f}, 0xffff0000},
+		{{ 40.0f,  40.0f, 0.0f, 0.0f}, 0xffff0000},
+		{{600.0f,  40.0f, 0.0f, 0.0f}, 0xffff0000},
+		{{ 40.0f, 440.0f, 0.0f, 0.0f}, 0xffff0000},
+		{{600.0f, 440.0f, 0.0f, 0.0f}, 0xffff0000},
 	};
 
 	// projection matrix.
 	// fovy:90 degrees, aspect ratio: 4/3,
 	// near plane: 1, far plane: 101
-	static const D3DMATRIX proj =
+	static const D3DMATRIX proj[] =
+	{
 	{{{
 		0.75f, 0.0f,  0.0f,  0.0f,
 		0.0f,  1.0f,  0.0f,  0.0f,
 		0.0f,  0.0f,  1.01f, 1.0f,
 		0.0f,  0.0f, -1.01f, 0.0f
-	}}};
+	}}},
+	{{{
+		1.5f,  0.0f,  0.0f,  0.0f,
+		0.0f,  2.0f,  0.0f,  0.0f,
+		0.0f,  0.0f,  2.02f, 2.0f,
+		0.0f,  0.0f, -2.02f, 0.0f
+	}}},
+	{{{
+		1.0f,  0.0f,  0.0f,  0.0f,
+		0.0f,  1.0f,  0.0f,  0.0f,
+		0.0f,  0.0f,  1.0f,  0.0f,
+		0.0f,  0.0f,  0.0f,  1.0f
+	}}},
+	};
 	static const struct
 	{
+		unsigned int matrix_id;
 		float z, w;
 		D3DZBUFFERTYPE z_test;
 		D3DCOLOR color;
 	}
 	tests[] =
 	{
-		{0.7f,  0.9f, D3DZB_TRUE,  0x0000ff00},
-		{0.7f,  0.9f, D3DZB_FALSE, 0x0000ff00},
-		{0.7f,  1.1f, D3DZB_TRUE,  0x0017e800},
-		{0.7f,  1.1f, D3DZB_FALSE, 0x0017e800},
-		{0.7f,  3.0f, D3DZB_TRUE,  0x00aa5500},
-		{0.7f,  3.0f, D3DZB_FALSE, 0x00aa5500},
-		{0.3f,  2.6f, D3DZB_TRUE,  0x009d6200},
-		{0.3f,  2.6f, D3DZB_FALSE, 0x009d6200},
+		{0, 0.7f,  0.2f, D3DZB_TRUE,  0x0000ff00},
+		{0, 0.7f,  0.2f, D3DZB_FALSE, 0x0000ff00},
+		{0, 0.7f,  1.8f, D3DZB_TRUE,  0x00827c00},
+		{0, 0.7f,  1.8f, D3DZB_FALSE, 0x00827c00},
+		{0, 0.7f,  3.0f, D3DZB_TRUE,  0x00b04e00},
+		{0, 0.7f,  3.0f, D3DZB_FALSE, 0x00b04e00},
+		{0, 0.3f,  2.6f, D3DZB_TRUE,  0x00a55900},
+		{0, 0.3f,  2.6f, D3DZB_FALSE, 0x00a55900},
+		{1, 0.7f,  0.2f, D3DZB_TRUE,  0x0000ff00},
+		{1, 0.7f,  0.2f, D3DZB_FALSE, 0x0000ff00},
+		{1, 0.7f,  1.8f, D3DZB_TRUE,  0x00827c00},
+		{1, 0.7f,  1.8f, D3DZB_FALSE, 0x00827c00},
+		{1, 0.7f,  3.0f, D3DZB_TRUE,  0x00b04e00},
+		{1, 0.7f,  3.0f, D3DZB_FALSE, 0x00b04e00},
+		{1, 0.3f,  2.6f, D3DZB_TRUE,  0x00a55900},
+		{1, 0.3f,  2.6f, D3DZB_FALSE, 0x00a55900},
+		{2, 0.7f,  0.2f, D3DZB_TRUE,  0x000df200},
+		{2, 0.7f,  0.2f, D3DZB_FALSE, 0x000df200},
+		{2, 0.7f,  1.8f, D3DZB_TRUE,  0x000df200},
+		{2, 0.7f,  1.8f, D3DZB_FALSE, 0x000df200},
+		{2, 0.7f,  3.0f, D3DZB_TRUE,  0x000df200},
+		{2, 0.7f,  3.0f, D3DZB_FALSE, 0x000df200},
+		{2, 0.3f,  2.6f, D3DZB_TRUE,  0x00738c00},
+		{2, 0.3f,  2.6f, D3DZB_FALSE, 0x00738c00},
 	};
 	unsigned int i;
 
@@ -238,8 +269,6 @@ int main(int argc, char* argv[]) {
 	ok(SUCCEEDED(hr), "Failed to set render state, hr %#x.\n", hr);
 	hr = IDirect3DDevice9_SetRenderState(device, D3DRS_CLIPPING, FALSE);
 	ok(SUCCEEDED(hr), "SetRenderState failed, hr %#x.\n", hr);
-	hr = IDirect3DDevice9_SetTransform(device, D3DTS_PROJECTION, &proj);
-	ok(SUCCEEDED(hr), "Failed to set projection transform, hr %#x.\n", hr);
 	hr = IDirect3DDevice9_SetRenderState(device, D3DRS_FOGTABLEMODE, D3DFOG_LINEAR);
 	ok(SUCCEEDED(hr), "Failed to set render state, hr %#x.\n", hr);
 	hr = IDirect3DDevice9_SetFVF(device, D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
@@ -263,19 +292,19 @@ int main(int argc, char* argv[]) {
 	
 	for (i = 0; i < ARRAY_SIZE(tests); ++i)
 	{
+		hr = IDirect3DDevice9_SetTransform(device, D3DTS_PROJECTION, &proj[tests[i].matrix_id]);
+		ok(SUCCEEDED(hr), "Failed to set projection transform, hr %#x.\n", hr);
 		hr = IDirect3DDevice9_Clear(device, 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x000000ff, 1.0f, 0);
 		ok(SUCCEEDED(hr), "Failed to clear, hr %#x.\n", hr);
 
-		/*
-		quad[0].position.z = tests[i].z;
-		quad[1].position.z = tests[i].z;
-		quad[2].position.z = tests[i].z;
-		quad[3].position.z = tests[i].z;
-		*/
-		quad[0].position.w = tests[i].w;
-		quad[1].position.w = tests[i].w;
-		quad[2].position.w = tests[i].w;
-		quad[3].position.w = tests[i].w;
+		quad[0].position.z = 0.1f + tests[i].z;
+		quad[1].position.z = 0.2f + tests[i].z;
+		quad[2].position.z = 0.3f + tests[i].z;
+		quad[3].position.z = 0.4f + tests[i].z;
+		quad[0].position.w = 0.1f + tests[i].w;
+		quad[1].position.w = 0.2f + tests[i].w;
+		quad[2].position.w = 0.3f + tests[i].w;
+		quad[3].position.w = 0.4f + tests[i].w;
 		hr = IDirect3DDevice9_SetRenderState(device, D3DRS_ZENABLE, tests[i].z_test);
 		ok(SUCCEEDED(hr), "Failed to set render state, hr %#x.\n", hr);
 
