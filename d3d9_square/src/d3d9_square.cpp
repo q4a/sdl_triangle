@@ -195,14 +195,14 @@ int main(int argc, char* argv[]) {
 	}
 	tests[] =
 	{
-		{0.7f,  0.0f, D3DZB_TRUE,  0x0000ff00},
-		{0.7f,  0.0f, D3DZB_FALSE, 0x0000ff00},
-		{0.7f,  0.3f, D3DZB_TRUE,  0x0000ff00},
-		{0.7f,  0.3f, D3DZB_FALSE, 0x0000ff00},
+		{0.7f,  0.9f, D3DZB_TRUE,  0x0000ff00},
+		{0.7f,  0.9f, D3DZB_FALSE, 0x0000ff00},
+		{0.7f,  1.1f, D3DZB_TRUE,  0x0017e800},
+		{0.7f,  1.1f, D3DZB_FALSE, 0x0017e800},
 		{0.7f,  3.0f, D3DZB_TRUE,  0x00aa5500},
 		{0.7f,  3.0f, D3DZB_FALSE, 0x00aa5500},
-		{0.3f,  0.0f, D3DZB_TRUE,  0x0000ff00},
-		{0.3f,  0.0f, D3DZB_FALSE, 0x0000ff00},
+		{0.3f,  2.6f, D3DZB_TRUE,  0x009d6200},
+		{0.3f,  2.6f, D3DZB_FALSE, 0x009d6200},
 	};
 	unsigned int i;
 
@@ -266,10 +266,12 @@ int main(int argc, char* argv[]) {
 		hr = IDirect3DDevice9_Clear(device, 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x000000ff, 1.0f, 0);
 		ok(SUCCEEDED(hr), "Failed to clear, hr %#x.\n", hr);
 
+		/*
 		quad[0].position.z = tests[i].z;
 		quad[1].position.z = tests[i].z;
 		quad[2].position.z = tests[i].z;
 		quad[3].position.z = tests[i].z;
+		*/
 		quad[0].position.w = tests[i].w;
 		quad[1].position.w = tests[i].w;
 		quad[2].position.w = tests[i].w;
