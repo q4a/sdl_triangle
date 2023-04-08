@@ -9,6 +9,11 @@
 #define win_skip(...) {fprintf(stdout, "skip "); fprintf(stdout, __VA_ARGS__);}
 #define trace(...) {fprintf(stdout, "trace ");fprintf(stdout, __VA_ARGS__);}
 
+struct vec3
+{
+	float x, y, z;
+};
+
 struct vec4
 {
 	float x, y, z, w;
@@ -169,13 +174,26 @@ int main(int argc, char* argv[]) {
 		struct vec4 position;
 		D3DCOLOR diffuse;
 	}
-	quad[] =
+	untransformed_q[] =
 	{
-		{{ 40.0f,  40.0f, 0.0f, 0.0f}, 0xffff0000},
-		{{600.0f,  40.0f, 0.0f, 0.0f}, 0xffff0000},
-		{{ 40.0f, 440.0f, 0.0f, 0.0f}, 0xffff0000},
-		{{600.0f, 440.0f, 0.0f, 0.0f}, 0xffff0000},
+		{{  0.0f,   0.0f, 0.0f, 0.0f}, 0xffff0000},
+		{{640.0f,   0.0f, 0.0f, 0.0f}, 0xffff0000},
+		{{  0.0f, 480.0f, 0.0f, 0.0f}, 0xffff0000},
+		{{640.0f, 480.0f, 0.0f, 0.0f}, 0xffff0000},
 	};
+	static struct
+	{
+		struct vec3 position;
+		D3DCOLOR diffuse;
+	}
+	transformed_q[] =
+	{
+		{{-1.0f, -1.0f, 0.0f}, 0xffff0000},
+		{{-1.0f,  1.0f, 0.0f}, 0xffff0000},
+		{{ 1.0f,  1.0f, 0.0f}, 0xffff0000},
+		{{ 1.0f, -1.0f, 0.0f}, 0xffff0000},
+	};
+	static const WORD indices[] = { 0, 1, 2, 2, 3, 0 };
 
 	// projection matrix.
 	// fovy:90 degrees, aspect ratio: 4/3,
@@ -205,35 +223,30 @@ int main(int argc, char* argv[]) {
 	{
 		unsigned int matrix_id;
 		float z, w;
-		D3DZBUFFERTYPE z_test;
+		unsigned int format_bits;
 		D3DCOLOR color;
 	}
 	tests[] =
 	{
-		{0, 0.7f,  0.2f, D3DZB_TRUE,  0x0000ff00},
-		{0, 0.7f,  0.2f, D3DZB_FALSE, 0x0000ff00},
-		{0, 0.7f,  1.8f, D3DZB_TRUE,  0x00827c00},
-		{0, 0.7f,  1.8f, D3DZB_FALSE, 0x00827c00},
-		{0, 0.7f,  3.0f, D3DZB_TRUE,  0x00b04e00},
-		{0, 0.7f,  3.0f, D3DZB_FALSE, 0x00b04e00},
-		{0, 0.3f,  2.6f, D3DZB_TRUE,  0x00a55900},
-		{0, 0.3f,  2.6f, D3DZB_FALSE, 0x00a55900},
-		{1, 0.7f,  0.2f, D3DZB_TRUE,  0x0000ff00},
-		{1, 0.7f,  0.2f, D3DZB_FALSE, 0x0000ff00},
-		{1, 0.7f,  1.8f, D3DZB_TRUE,  0x00827c00},
-		{1, 0.7f,  1.8f, D3DZB_FALSE, 0x00827c00},
-		{1, 0.7f,  3.0f, D3DZB_TRUE,  0x00b04e00},
-		{1, 0.7f,  3.0f, D3DZB_FALSE, 0x00b04e00},
-		{1, 0.3f,  2.6f, D3DZB_TRUE,  0x00a55900},
-		{1, 0.3f,  2.6f, D3DZB_FALSE, 0x00a55900},
-		{2, 0.7f,  0.2f, D3DZB_TRUE,  0x000df200},
-		{2, 0.7f,  0.2f, D3DZB_FALSE, 0x000df200},
-		{2, 0.7f,  1.8f, D3DZB_TRUE,  0x000df200},
-		{2, 0.7f,  1.8f, D3DZB_FALSE, 0x000df200},
-		{2, 0.7f,  3.0f, D3DZB_TRUE,  0x000df200},
-		{2, 0.7f,  3.0f, D3DZB_FALSE, 0x000df200},
-		{2, 0.3f,  2.6f, D3DZB_TRUE,  0x00738c00},
-		{2, 0.3f,  2.6f, D3DZB_FALSE, 0x00738c00},
+		{0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
+		{0, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff},
+		{0, 1.8f, 1.8f, D3DFVF_XYZRHW, 0x00827c00},
+		{0, 1.8f, 1.8f, D3DFVF_XYZ,    0x0000ff00},
+		{0, 3.0f, 3.0f, D3DFVF_XYZRHW, 0x00b04e00},
+		{0, 3.0f, 3.0f, D3DFVF_XYZ,    0x0000ff00},
+		{1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
+		{1, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff},
+		{1, 1.8f, 1.8f, D3DFVF_XYZRHW, 0x00827c00},
+		{1, 1.8f, 1.8f, D3DFVF_XYZ,    0x0000ff00},
+		//
+		{1, 3.0f, 3.0f, D3DFVF_XYZRHW, 0x00b04e00},
+		{1, 3.0f, 3.0f, D3DFVF_XYZ,    0x0000ff00},
+		{2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x008c7300},
+		{2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00996600},
+		{2, 1.8f, 1.8f, D3DFVF_XYZRHW, 0x0000ff00},
+		{2, 1.8f, 1.8f, D3DFVF_XYZ,    0x000000ff},
+		{2, 3.0f, 3.0f, D3DFVF_XYZRHW, 0x0000ff00},
+		{2, 3.0f, 3.0f, D3DFVF_XYZ,    0x000000ff},
 	};
 	unsigned int i;
 
@@ -271,8 +284,8 @@ int main(int argc, char* argv[]) {
 	ok(SUCCEEDED(hr), "SetRenderState failed, hr %#x.\n", hr);
 	hr = IDirect3DDevice9_SetRenderState(device, D3DRS_FOGTABLEMODE, D3DFOG_LINEAR);
 	ok(SUCCEEDED(hr), "Failed to set render state, hr %#x.\n", hr);
-	hr = IDirect3DDevice9_SetFVF(device, D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
-	ok(SUCCEEDED(hr), "Failed to set fvf, hr %#x.\n", hr);
+	hr = IDirect3DDevice9_SetRenderState(device, D3DRS_ZENABLE, D3DZB_FALSE);
+	ok(SUCCEEDED(hr), "Failed to set render state, hr %#x.\n", hr);
 
 	MSG msg;
 	ZeroMemory(&msg, sizeof(MSG));
@@ -291,29 +304,45 @@ int main(int argc, char* argv[]) {
 
 	
 	for (i = 0; i < ARRAY_SIZE(tests); ++i)
+	//i = 4;
 	{
 		hr = IDirect3DDevice9_SetTransform(device, D3DTS_PROJECTION, &proj[tests[i].matrix_id]);
 		ok(SUCCEEDED(hr), "Failed to set projection transform, hr %#x.\n", hr);
+		hr = IDirect3DDevice9_SetFVF(device, tests[i].format_bits | D3DFVF_DIFFUSE);
+		ok(SUCCEEDED(hr), "Failed to set fvf, hr %#x.\n", hr);
 		hr = IDirect3DDevice9_Clear(device, 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x000000ff, 1.0f, 0);
 		ok(SUCCEEDED(hr), "Failed to clear, hr %#x.\n", hr);
 
-		quad[0].position.z = 0.1f + tests[i].z;
-		quad[1].position.z = 0.2f + tests[i].z;
-		quad[2].position.z = 0.3f + tests[i].z;
-		quad[3].position.z = 0.4f + tests[i].z;
-		quad[0].position.w = 0.1f + tests[i].w;
-		quad[1].position.w = 0.2f + tests[i].w;
-		quad[2].position.w = 0.3f + tests[i].w;
-		quad[3].position.w = 0.4f + tests[i].w;
-		hr = IDirect3DDevice9_SetRenderState(device, D3DRS_ZENABLE, tests[i].z_test);
-		ok(SUCCEEDED(hr), "Failed to set render state, hr %#x.\n", hr);
-
-		hr = IDirect3DDevice9_BeginScene(device);
-		ok(SUCCEEDED(hr), "Failed to begin scene, hr %#x.\n", hr);
-		hr = IDirect3DDevice9_DrawPrimitiveUP(device, D3DPT_TRIANGLESTRIP, 2, quad, sizeof(quad[0]));
-		ok(SUCCEEDED(hr), "Failed to draw, hr %#x.\n", hr);
-		hr = IDirect3DDevice9_EndScene(device);
-		ok(SUCCEEDED(hr), "Failed to end scene, hr %#x.\n", hr);
+		if (tests[i].format_bits == D3DFVF_XYZRHW)
+		{
+			untransformed_q[0].position.z = 0.1f + tests[i].z;
+			untransformed_q[1].position.z = 0.2f + tests[i].z;
+			untransformed_q[2].position.z = 0.3f + tests[i].z;
+			untransformed_q[3].position.z = 0.4f + tests[i].z;
+			untransformed_q[0].position.w = 0.1f + tests[i].w;
+			untransformed_q[1].position.w = 0.2f + tests[i].w;
+			untransformed_q[2].position.w = 0.3f + tests[i].w;
+			untransformed_q[3].position.w = 0.4f + tests[i].w;
+			hr = IDirect3DDevice9_BeginScene(device);
+			ok(SUCCEEDED(hr), "Failed to begin scene, hr %#x.\n", hr);
+			hr = IDirect3DDevice9_DrawPrimitiveUP(device, D3DPT_TRIANGLESTRIP, 2, untransformed_q, sizeof(untransformed_q[0]));
+			ok(SUCCEEDED(hr), "Failed to draw, hr %#x.\n", hr);
+			hr = IDirect3DDevice9_EndScene(device);
+			ok(SUCCEEDED(hr), "Failed to end scene, hr %#x.\n", hr);
+		}
+		else
+		{
+			transformed_q[0].position.z = 0.1f + tests[i].z;
+			transformed_q[1].position.z = 0.2f + tests[i].z;
+			transformed_q[2].position.z = 0.3f + tests[i].z;
+			transformed_q[3].position.z = 0.4f + tests[i].z;
+			hr = IDirect3DDevice9_BeginScene(device);
+			ok(SUCCEEDED(hr), "Failed to begin scene, hr %#x.\n", hr);
+			hr = IDirect3DDevice9_DrawIndexedPrimitiveUP(device, D3DPT_TRIANGLELIST, 0, 4, 2, indices, D3DFMT_INDEX16, transformed_q, sizeof(transformed_q[0]));
+			ok(SUCCEEDED(hr), "Failed to draw, hr %#x.\n", hr);
+			hr = IDirect3DDevice9_EndScene(device);
+			ok(SUCCEEDED(hr), "Failed to end scene, hr %#x.\n", hr);
+		}
 
 		color = getPixelColor(device, 320, 240);
 		ok(color_match(color, tests[i].color, 2),
