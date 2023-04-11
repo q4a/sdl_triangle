@@ -161,7 +161,7 @@ static IDirect3DDevice9* create_device(IDirect3D9* d3d, HWND device_window, HWND
 // main ... The main function, right now it just calls the initialization of SDL.
 int main(int argc, char* argv[]) {
 	
-	float start = 0.0f, end = 1.0f;
+	float start = 0.0f, end = 1.5f;
 	HRESULT hr;
 	IDirect3DDevice9* device;
 	IDirect3D9* d3d;
@@ -176,10 +176,10 @@ int main(int argc, char* argv[]) {
 	}
 	untransformed_q[] =
 	{
-		{{  0.0f,   0.0f, 0.0f, 0.0f}, 0xffff0000},
-		{{640.0f,   0.0f, 0.0f, 0.0f}, 0xffff0000},
-		{{  0.0f, 480.0f, 0.0f, 0.0f}, 0xffff0000},
-		{{640.0f, 480.0f, 0.0f, 0.0f}, 0xffff0000},
+		{ {160.0f, 120.0f, 0.0f, 0.0f}, 0xffff0000},
+		{ {480.0f, 120.0f, 0.0f, 0.0f}, 0xffff0000},
+		{ {160.0f, 360.0f, 0.0f, 0.0f}, 0xffff0000},
+		{ {480.0f, 360.0f, 0.0f, 0.0f}, 0xffff0000},
 	};
 	static struct
 	{
@@ -188,10 +188,10 @@ int main(int argc, char* argv[]) {
 	}
 	transformed_q[] =
 	{
-		{{-1.0f,  1.0f, 0.0f}, 0xffff0000},
-		{{ 1.0f,  1.0f, 0.0f}, 0xffff0000},
-		{{-1.0f, -1.0f, 0.0f}, 0xffff0000},
-		{{ 1.0f, -1.0f, 0.0f}, 0xffff0000},
+		{{-0.5f,  0.5f, 0.0f}, 0xffff0000},
+		{{ 0.5f,  0.5f, 0.0f}, 0xffff0000},
+		{{-0.5f, -0.5f, 0.0f}, 0xffff0000},
+		{{ 0.5f, -0.5f, 0.0f}, 0xffff0000},
 	};
 
 	// projection matrix.
@@ -229,21 +229,21 @@ int main(int argc, char* argv[]) {
 	{
 		{0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
 		{0, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff},
-		{0, 1.8f, 1.8f, D3DFVF_XYZRHW, 0x00827c00},
-		{0, 1.8f, 1.8f, D3DFVF_XYZ,    0x0000ff00},
-		{0, 3.0f, 3.0f, D3DFVF_XYZRHW, 0x00b04e00},
+		{0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
+		{0, 1.2f, 1.2f, D3DFVF_XYZ,    0x0008f600},
+		{0, 3.0f, 3.0f, D3DFVF_XYZRHW, 0x00ce3100},
 		{0, 3.0f, 3.0f, D3DFVF_XYZ,    0x0000ff00},
 		{1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
 		{1, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff},
-		{1, 1.8f, 1.8f, D3DFVF_XYZRHW, 0x00827c00},
-		{1, 1.8f, 1.8f, D3DFVF_XYZ,    0x0000ff00},
+		{1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
+		{1, 1.2f, 1.2f, D3DFVF_XYZ,    0x0000ff00},
 		//
-		{1, 3.0f, 3.0f, D3DFVF_XYZRHW, 0x00b04e00},
+		{1, 3.0f, 3.0f, D3DFVF_XYZRHW, 0x00ce3100},
 		{1, 3.0f, 3.0f, D3DFVF_XYZ,    0x0000ff00},
-		{2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x008c7300},
-		{2, 0.2f, 0.2f, D3DFVF_XYZ,    0x008c7300},
-		{2, 1.8f, 1.8f, D3DFVF_XYZRHW, 0x0000ff00},
-		{2, 1.8f, 1.8f, D3DFVF_XYZ,    0x000000ff},
+		{2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00},
+		{2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00},
+		{2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600},
+		{2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},
 		{2, 3.0f, 3.0f, D3DFVF_XYZRHW, 0x0000ff00},
 		{2, 3.0f, 3.0f, D3DFVF_XYZ,    0x000000ff},
 	};
@@ -318,10 +318,10 @@ int main(int argc, char* argv[]) {
 			untransformed_q[1].position.z = 0.2f + tests[i].z;
 			untransformed_q[2].position.z = 0.3f + tests[i].z;
 			untransformed_q[3].position.z = 0.4f + tests[i].z;
-			untransformed_q[0].position.w = 0.1f + tests[i].w;
-			untransformed_q[1].position.w = 0.2f + tests[i].w;
-			untransformed_q[2].position.w = 0.3f + tests[i].w;
-			untransformed_q[3].position.w = 0.4f + tests[i].w;
+			untransformed_q[0].position.w = 0.6f + tests[i].w;
+			untransformed_q[1].position.w = 0.5f + tests[i].w;
+			untransformed_q[2].position.w = 0.4f + tests[i].w;
+			untransformed_q[3].position.w = 0.3f + tests[i].w;
 			hr = IDirect3DDevice9_BeginScene(device);
 			ok(SUCCEEDED(hr), "Failed to begin scene, hr %#x.\n", hr);
 			hr = IDirect3DDevice9_DrawPrimitiveUP(device, D3DPT_TRIANGLESTRIP, 2, untransformed_q, sizeof(untransformed_q[0]));
