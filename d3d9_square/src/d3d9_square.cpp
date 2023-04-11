@@ -217,21 +217,19 @@ int main(int argc, char* argv[]) {
 	};
 
 	// projection matrix.
-	// fovy:90 degrees, aspect ratio: 4/3,
-	// near plane: 1, far plane: 101
 	static const D3DMATRIX proj[] =
 	{
 	{{{
-		0.75f, 0.0f,  0.0f,  0.0f,
-		0.0f,  1.0f,  0.0f,  0.0f,
-		0.0f,  0.0f,  1.01f, 1.0f,
-		0.0f,  0.0f, -1.01f, 0.0f
+		0.75f, 0.0f,  0.0f,   0.0f,
+		0.0f,  1.0f,  0.0f,   0.0f,
+		0.0f,  0.0f,  0.202f, 1.0f,
+		0.0f,  0.0f, -0.202f, 0.0f
 	}}},
 	{{{
-		1.5f,  0.0f,  0.0f,  0.0f,
-		0.0f,  2.0f,  0.0f,  0.0f,
-		0.0f,  0.0f,  2.02f, 2.0f,
-		0.0f,  0.0f, -2.02f, 0.0f
+		1.5f,  0.0f,  0.0f,   0.0f,
+		0.0f,  2.0f,  0.0f,   0.0f,
+		0.0f,  0.0f,  0.404f, 2.0f,
+		0.0f,  0.0f, -0.404f, 0.0f
 	}}},
 	{{{
 		1.0f,  0.0f,  0.0f,  0.0f,
@@ -244,7 +242,7 @@ int main(int argc, char* argv[]) {
 	{
 		int vshader, pshader;
 		unsigned int matrix_id;
-		float z, w;
+		float z, rhw;
 		unsigned int format_bits;
 		D3DCOLOR color;
 	}
@@ -383,10 +381,10 @@ int main(int argc, char* argv[]) {
 			untransformed_q[1].position.z = 0.2f + tests[i].z;
 			untransformed_q[2].position.z = 0.3f + tests[i].z;
 			untransformed_q[3].position.z = 0.4f + tests[i].z;
-			untransformed_q[0].position.w = 0.6f + tests[i].w;
-			untransformed_q[1].position.w = 0.5f + tests[i].w;
-			untransformed_q[2].position.w = 0.4f + tests[i].w;
-			untransformed_q[3].position.w = 0.3f + tests[i].w;
+			untransformed_q[0].position.w = 0.6f + tests[i].rhw;
+			untransformed_q[1].position.w = 0.5f + tests[i].rhw;
+			untransformed_q[2].position.w = 0.4f + tests[i].rhw;
+			untransformed_q[3].position.w = 0.3f + tests[i].rhw;
 			hr = IDirect3DDevice9_BeginScene(device);
 			ok(SUCCEEDED(hr), "Failed to begin scene, hr %#x.\n", hr);
 			hr = IDirect3DDevice9_DrawPrimitiveUP(device, D3DPT_TRIANGLESTRIP, 2, untransformed_q, sizeof(untransformed_q[0]));
