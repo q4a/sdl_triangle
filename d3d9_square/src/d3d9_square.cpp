@@ -161,6 +161,8 @@ static IDirect3DDevice9* create_device(IDirect3D9* d3d, HWND device_window, HWND
 // main ... The main function, right now it just calls the initialization of SDL.
 int main(int argc, char* argv[]) {
 	
+	IDirect3DVertexShader9* vertex_shader[2] = { NULL, NULL, };
+	IDirect3DPixelShader9* pixel_shader[2] = { NULL, NULL, };
 	float start = 0.0f, end = 1.5f;
 	HRESULT hr;
 	IDirect3DDevice9* device;
@@ -169,6 +171,26 @@ int main(int argc, char* argv[]) {
 	HWND window;
 	D3DCOLOR color;
 	D3DCAPS9 caps;
+	/* basic vertex shader with reversed fog computation ("foggy") */
+	static const DWORD vertex_shader_code1[] =
+	{
+		0xfffe0101,                                                             /* vs_1_1                        */
+		0x0000001f, 0x80000000, 0x900f0000,                                     /* dcl_position v0               */
+		0x0000001f, 0x8000000a, 0x900f0001,                                     /* dcl_color0 v1                 */
+		0x00000051, 0xa00f0000, 0xbfa00000, 0x00000000, 0xbf666666, 0x00000000, /* def c0, -1.25, 0.0, -0.9, 0.0 */
+		0x00000001, 0xc00f0000, 0x90e40000,                                     /* mov oPos, v0                  */
+		0x00000001, 0xd00f0000, 0x90e40001,                                     /* mov oD0, v1                   */
+		0x00000002, 0x800f0000, 0x90aa0000, 0xa0aa0000,                         /* add r0, v0.z, c0.z            */
+		0x00000005, 0xc00f0001, 0x80000000, 0xa0000000,                         /* mul oFog, r0.x, c0.x          */
+		0x0000ffff
+	};
+	/* basic pixel shader */
+	static const DWORD pixel_shader_code1[] =
+	{
+		0xffff0101,                                                             /* ps_1_1     */
+		0x00000001, 0x800f0000, 0x90e40000,                                     /* mov r0, v0 */
+		0x0000ffff
+	};
 	static struct
 	{
 		struct vec4 position;
@@ -220,6 +242,7 @@ int main(int argc, char* argv[]) {
 	};
 	static const struct
 	{
+		int vshader, pshader;
 		unsigned int matrix_id;
 		float z, w;
 		unsigned int format_bits;
@@ -227,25 +250,59 @@ int main(int argc, char* argv[]) {
 	}
 	tests[] =
 	{
-		{0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
-		{0, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff},
-		{0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
-		{0, 1.2f, 1.2f, D3DFVF_XYZ,    0x0008f600},
-		{0, 3.0f, 3.0f, D3DFVF_XYZRHW, 0x00ce3100},
-		{0, 3.0f, 3.0f, D3DFVF_XYZ,    0x0000ff00},
-		{1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
-		{1, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff},
-		{1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
-		{1, 1.2f, 1.2f, D3DFVF_XYZ,    0x0000ff00},
-		//
-		{1, 3.0f, 3.0f, D3DFVF_XYZRHW, 0x00ce3100},
-		{1, 3.0f, 3.0f, D3DFVF_XYZ,    0x0000ff00},
-		{2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00},
-		{2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00},
-		{2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600},
-		{2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},
-		{2, 3.0f, 3.0f, D3DFVF_XYZRHW, 0x0000ff00},
-		{2, 3.0f, 3.0f, D3DFVF_XYZ,    0x000000ff},
+		//0-9
+		{0, 0, 0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
+		{0, 0, 0, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff},
+		{0, 0, 0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
+		{0, 0, 0, 1.2f, 1.2f, D3DFVF_XYZ,    0x0008f600},
+		{0, 0, 1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
+		{0, 0, 1, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff},
+		{0, 0, 1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
+		{0, 0, 1, 1.2f, 1.2f, D3DFVF_XYZ,    0x0000ff00},
+		{0, 0, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00},
+		{0, 0, 2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00},
+		//10-19
+		{0, 0, 2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600},
+		{0, 0, 2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},
+		{0, 1, 0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
+		{0, 1, 0, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff},
+		{0, 1, 0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
+		{0, 1, 0, 1.2f, 1.2f, D3DFVF_XYZ,    0x0008f600},
+		{0, 1, 1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
+		{0, 1, 1, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff},
+		{0, 1, 1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
+		{0, 1, 1, 1.2f, 1.2f, D3DFVF_XYZ,    0x0000ff00},
+		//20-29
+		{0, 1, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00},
+		{0, 1, 2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00},
+		{0, 1, 2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600},
+		{0, 1, 2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},
+		{1, 0, 0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
+		{1, 0, 0, 0.2f, 0.2f, D3DFVF_XYZ,    0x0055aa00},//other
+		{1, 0, 0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
+		{1, 0, 0, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},//other
+		{1, 0, 1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
+		{1, 0, 1, 0.2f, 0.2f, D3DFVF_XYZ,    0x0055aa00},//other
+		//30-39
+		{1, 0, 1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
+		{1, 0, 1, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},//other
+		{1, 0, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00},
+		{1, 0, 2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00},
+		{1, 0, 2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600},
+		{1, 0, 2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},
+		{1, 1, 0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
+		{1, 1, 0, 0.2f, 0.2f, D3DFVF_XYZ,    0x0055aa00},//other
+		{1, 1, 0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
+		{1, 1, 0, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},//other
+		//40-47
+		{1, 1, 1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
+		{1, 1, 1, 0.2f, 0.2f, D3DFVF_XYZ,    0x0055aa00},//other
+		{1, 1, 1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
+		{1, 1, 1, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},//other
+		{1, 1, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00},
+		{1, 1, 2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00},
+		{1, 1, 2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600},
+		{1, 1, 2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},
 	};
 	unsigned int i;
 
@@ -269,6 +326,10 @@ int main(int argc, char* argv[]) {
 		goto done;
 	}
 
+	hr = IDirect3DDevice9_CreateVertexShader(device, vertex_shader_code1, &vertex_shader[1]);
+	ok(SUCCEEDED(hr), "CreateVertexShader failed (%08x)\n", hr);
+	hr = IDirect3DDevice9_CreatePixelShader(device, pixel_shader_code1, &pixel_shader[1]);
+	ok(SUCCEEDED(hr), "CreatePixelShader failed (%08x)\n", hr);
 	hr = IDirect3DDevice9_SetRenderState(device, D3DRS_LIGHTING, FALSE);
 	ok(SUCCEEDED(hr), "Failed to set render state, hr %#x.\n", hr);
 	hr = IDirect3DDevice9_SetRenderState(device, D3DRS_FOGENABLE, TRUE);
@@ -309,6 +370,10 @@ int main(int argc, char* argv[]) {
 		ok(SUCCEEDED(hr), "Failed to set projection transform, hr %#x.\n", hr);
 		hr = IDirect3DDevice9_SetFVF(device, tests[i].format_bits | D3DFVF_DIFFUSE);
 		ok(SUCCEEDED(hr), "Failed to set fvf, hr %#x.\n", hr);
+		hr = IDirect3DDevice9_SetVertexShader(device, vertex_shader[tests[i].vshader]);
+		ok(SUCCEEDED(hr), "SetVertexShader failed (%08x)\n", hr);
+		hr = IDirect3DDevice9_SetPixelShader(device, pixel_shader[tests[i].pshader]);
+		ok(SUCCEEDED(hr), "SetPixelShader failed (%08x)\n", hr);
 		hr = IDirect3DDevice9_Clear(device, 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x000000ff, 1.0f, 0);
 		ok(SUCCEEDED(hr), "Failed to clear, hr %#x.\n", hr);
 
