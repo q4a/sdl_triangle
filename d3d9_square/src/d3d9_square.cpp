@@ -188,12 +188,11 @@ int main(int argc, char* argv[]) {
 	}
 	transformed_q[] =
 	{
-		{{-1.0f, -1.0f, 0.0f}, 0xffff0000},
 		{{-1.0f,  1.0f, 0.0f}, 0xffff0000},
 		{{ 1.0f,  1.0f, 0.0f}, 0xffff0000},
+		{{-1.0f, -1.0f, 0.0f}, 0xffff0000},
 		{{ 1.0f, -1.0f, 0.0f}, 0xffff0000},
 	};
-	static const WORD indices[] = { 0, 1, 2, 2, 3, 0 };
 
 	// projection matrix.
 	// fovy:90 degrees, aspect ratio: 4/3,
@@ -242,7 +241,7 @@ int main(int argc, char* argv[]) {
 		{1, 3.0f, 3.0f, D3DFVF_XYZRHW, 0x00b04e00},
 		{1, 3.0f, 3.0f, D3DFVF_XYZ,    0x0000ff00},
 		{2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x008c7300},
-		{2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00996600},
+		{2, 0.2f, 0.2f, D3DFVF_XYZ,    0x008c7300},
 		{2, 1.8f, 1.8f, D3DFVF_XYZRHW, 0x0000ff00},
 		{2, 1.8f, 1.8f, D3DFVF_XYZ,    0x000000ff},
 		{2, 3.0f, 3.0f, D3DFVF_XYZRHW, 0x0000ff00},
@@ -338,7 +337,7 @@ int main(int argc, char* argv[]) {
 			transformed_q[3].position.z = 0.4f + tests[i].z;
 			hr = IDirect3DDevice9_BeginScene(device);
 			ok(SUCCEEDED(hr), "Failed to begin scene, hr %#x.\n", hr);
-			hr = IDirect3DDevice9_DrawIndexedPrimitiveUP(device, D3DPT_TRIANGLELIST, 0, 4, 2, indices, D3DFMT_INDEX16, transformed_q, sizeof(transformed_q[0]));
+			hr = IDirect3DDevice9_DrawPrimitiveUP(device, D3DPT_TRIANGLESTRIP, 2, transformed_q, sizeof(transformed_q[0]));
 			ok(SUCCEEDED(hr), "Failed to draw, hr %#x.\n", hr);
 			hr = IDirect3DDevice9_EndScene(device);
 			ok(SUCCEEDED(hr), "Failed to end scene, hr %#x.\n", hr);
