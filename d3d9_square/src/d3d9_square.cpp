@@ -193,9 +193,9 @@ int main(int argc, char* argv[]) {
 	};
 	static const DWORD pixel_shader_code2[] =
 	{
-		0xffff0101,                                                             /* ps_1_1                     */
-		0x00000051, 0xa00f0000, 0x3f800000, 0x00000000, 0x3f800000, 0x3f800000, /* def c0, 1.0, 0.0, 1.0, 1.0 */
-		0x00000001, 0x800f0000, 0xa0e40000,                                     /* mov r0, c0                 */
+		0xffff0200,                                                             /* ps_2_0                     */
+		0x05000051, 0xa00f0000, 0x3f800000, 0x00000000, 0x3f800000, 0x3f800000, /* def c0, 1.0, 0.0, 1.0, 1.0 */
+		0x02000001, 0x800f0800, 0xa0e40000,                                     /* mov oC0, c0                */
 		0x0000ffff
 	};
 	static struct
