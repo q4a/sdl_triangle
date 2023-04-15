@@ -167,6 +167,7 @@ int main(int argc, char* argv[]) {
 	HRESULT hr;
 	IDirect3DDevice9* device;
 	IDirect3D9* d3d;
+	IDirect3DSurface9* ds;
 	ULONG refcount;
 	HWND window;
 	D3DCOLOR color;
@@ -247,6 +248,12 @@ int main(int argc, char* argv[]) {
 		0.0f,  0.0f,  0.0f,  1.0f
 	}}},
 	};
+	union
+	{
+		float f;
+		DWORD d;
+	} conv;
+
 	static const struct
 	{
 		int vshader, pshader;
@@ -301,22 +308,28 @@ int main(int argc, char* argv[]) {
 		{1, 1, 0, 0.2f, 0.2f, D3DFVF_XYZ,    0x0055aa00, 0x0055aa00},//has different color compared to version without ps/vs
 		{1, 1, 0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700, 0x00986700},
 		{1, 1, 0, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},//has different color compared to version without ps/vs
-		//40-49
+		//40-43
 		{1, 1, 1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00, 0x0000ff00},
 		{1, 1, 1, 0.2f, 0.2f, D3DFVF_XYZ,    0x0055aa00, 0x0055aa00},//has different color compared to version without ps/vs
 		{1, 1, 1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700, 0x00986700},
 		{1, 1, 1, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},//has different color compared to version without ps/vs
-		{1, 1, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00, 0x00b24c00},
-		{1, 1, 2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00, 0x00b24c00},
-		{1, 1, 2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600, 0x0008f600},
+
+		//44-53 - will have depth bias of 0.2
+		//colors 44-47 was equal to 32-35, colors 48-53 was equal to 0-5
+		//depth bias changed color:
+		{1, 1, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00906e00, 0x00906e00},
+		{1, 1, 2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00906e00, 0x00906e00},
+		{1, 1, 2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0000ff00, 0x0000ff00},
+		//depth bias did not change color:
 		{1, 1, 2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},
 		{0, 2, 0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00, 0x0000ff00},
 		{0, 2, 0, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},
-		//50-59
 		{0, 2, 0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700, 0x00986700},
 		{0, 2, 0, 1.2f, 1.2f, D3DFVF_XYZ,    0x0008f600, 0x0008f600},
 		{0, 2, 1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00, 0x0000ff00},
 		{0, 2, 1, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},
+
+		//54-59
 		{0, 2, 1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700, 0x00986700},
 		{0, 2, 1, 1.2f, 1.2f, D3DFVF_XYZ,    0x0000ff00, 0x0000ff00},
 		{0, 2, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00, 0x00aa5500},//Radeon HD8400-left, Ivy Bridge GT1-right
@@ -382,6 +395,13 @@ int main(int argc, char* argv[]) {
 	ok(SUCCEEDED(hr), "Failed to set render state, hr %#x.\n", hr);
 	hr = IDirect3DDevice9_SetRenderState(device, D3DRS_ZENABLE, D3DZB_FALSE);
 	ok(SUCCEEDED(hr), "Failed to set render state, hr %#x.\n", hr);
+	hr = IDirect3DDevice9_SetRenderState(device, D3DRS_TEXTUREFACTOR, 0x00ff00ff);
+	ok(SUCCEEDED(hr), "Failed to set render state, hr %#x.\n", hr);
+	hr = IDirect3DDevice9_CreateDepthStencilSurface(device, 640, 480, D3DFMT_D24X8,
+		D3DMULTISAMPLE_NONE, 0, FALSE, &ds, NULL);
+	ok(SUCCEEDED(hr), "Failed to create depth stencil surface, hr %#x.\n", hr);
+	hr = IDirect3DDevice9_SetDepthStencilSurface(device, ds);
+	ok(SUCCEEDED(hr), "Failed to set depth stencil surface, hr %#x.\n", hr);
 
 	MSG msg;
 	ZeroMemory(&msg, sizeof(MSG));
@@ -400,7 +420,6 @@ int main(int argc, char* argv[]) {
 
 	
 	for (i = 0; i < ARRAY_SIZE(tests); ++i)
-	//i = 4;
 	{
 		hr = IDirect3DDevice9_SetTransform(device, D3DTS_PROJECTION, &proj[tests[i].matrix_id]);
 		ok(SUCCEEDED(hr), "Failed to set projection transform, hr %#x.\n", hr);
@@ -412,6 +431,13 @@ int main(int argc, char* argv[]) {
 		ok(SUCCEEDED(hr), "SetPixelShader failed (%08x)\n", hr);
 		hr = IDirect3DDevice9_Clear(device, 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x000000ff, 1.0f, 0);
 		ok(SUCCEEDED(hr), "Failed to clear, hr %#x.\n", hr);
+
+		if (44 <= i && i <= 53)
+			conv.f = 0.2f;
+		else
+			conv.f = 0.0f;
+		hr = IDirect3DDevice9_SetRenderState(device, D3DRS_DEPTHBIAS, conv.d);
+		ok(SUCCEEDED(hr), "Failed to set render state, hr %#x.\n", hr);
 
 		if (tests[i].format_bits == D3DFVF_XYZRHW)
 		{
@@ -458,6 +484,7 @@ int main(int argc, char* argv[]) {
 	IDirect3DVertexShader9_Release(vertex_shader[1]);
 	IDirect3DPixelShader9_Release(pixel_shader[1]);
 	IDirect3DPixelShader9_Release(pixel_shader[2]);
+	IDirect3DSurface9_Release(ds);
 done:
 	refcount = IDirect3DDevice9_Release(device);
 	ok(!refcount, "Device has %u references left.\n", refcount);
