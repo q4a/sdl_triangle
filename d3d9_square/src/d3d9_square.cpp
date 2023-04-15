@@ -255,90 +255,90 @@ int main(int argc, char* argv[]) {
 		unsigned int matrix_id;
 		float z, rhw;
 		unsigned int format_bits;
-		D3DCOLOR color;
+		D3DCOLOR color1, color2;
 	}
 	tests[] =
 	{
 		//0-9
-		{0, 0, 0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
-		{0, 0, 0, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff},
-		{0, 0, 0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
-		{0, 0, 0, 1.2f, 1.2f, D3DFVF_XYZ,    0x0008f600},
-		{0, 0, 1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
-		{0, 0, 1, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff},
-		{0, 0, 1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
-		{0, 0, 1, 1.2f, 1.2f, D3DFVF_XYZ,    0x0000ff00},
-		{0, 0, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00},
-		{0, 0, 2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00},
+		{0, 0, 0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00, 0x0000ff00},
+		{0, 0, 0, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},
+		{0, 0, 0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700, 0x00986700},
+		{0, 0, 0, 1.2f, 1.2f, D3DFVF_XYZ,    0x0008f600, 0x0008f600},
+		{0, 0, 1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00, 0x0000ff00},
+		{0, 0, 1, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},
+		{0, 0, 1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700, 0x00986700},
+		{0, 0, 1, 1.2f, 1.2f, D3DFVF_XYZ,    0x0000ff00, 0x0000ff00},
+		{0, 0, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00, 0x00b24c00},
+		{0, 0, 2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00, 0x00b24c00},
 		//10-19
-		{0, 0, 2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600},
-		{0, 0, 2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},
-		{0, 1, 0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
-		{0, 1, 0, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff},
-		{0, 1, 0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
-		{0, 1, 0, 1.2f, 1.2f, D3DFVF_XYZ,    0x0008f600},
-		{0, 1, 1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
-		{0, 1, 1, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff},
-		{0, 1, 1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
-		{0, 1, 1, 1.2f, 1.2f, D3DFVF_XYZ,    0x0000ff00},
+		{0, 0, 2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600, 0x0008f600},
+		{0, 0, 2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},
+		{0, 1, 0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00, 0x0000ff00},
+		{0, 1, 0, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},
+		{0, 1, 0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700, 0x00986700},
+		{0, 1, 0, 1.2f, 1.2f, D3DFVF_XYZ,    0x0008f600, 0x0008f600},
+		{0, 1, 1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00, 0x0000ff00},
+		{0, 1, 1, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},
+		{0, 1, 1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700, 0x00986700},
+		{0, 1, 1, 1.2f, 1.2f, D3DFVF_XYZ,    0x0000ff00, 0x0000ff00},
 		//20-29
-		{0, 1, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00},
-		{0, 1, 2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00},
-		{0, 1, 2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600},
-		{0, 1, 2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},
-		{1, 0, 0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
-		{1, 0, 0, 0.2f, 0.2f, D3DFVF_XYZ,    0x0055aa00},//has different color compared to version without ps/vs
-		{1, 0, 0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
-		{1, 0, 0, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},//has different color compared to version without ps/vs
-		{1, 0, 1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
-		{1, 0, 1, 0.2f, 0.2f, D3DFVF_XYZ,    0x0055aa00},//has different color compared to version without ps/vs
+		{0, 1, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00, 0x00b24c00},
+		{0, 1, 2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00, 0x00b24c00},
+		{0, 1, 2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600, 0x0008f600},
+		{0, 1, 2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},
+		{1, 0, 0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00, 0x0000ff00},
+		{1, 0, 0, 0.2f, 0.2f, D3DFVF_XYZ,    0x0055aa00, 0x0055aa00},//has different color compared to version without ps/vs
+		{1, 0, 0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700, 0x00986700},
+		{1, 0, 0, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},//has different color compared to version without ps/vs
+		{1, 0, 1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00, 0x0000ff00},
+		{1, 0, 1, 0.2f, 0.2f, D3DFVF_XYZ,    0x0055aa00, 0x0055aa00},//has different color compared to version without ps/vs
 		//30-39
-		{1, 0, 1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
-		{1, 0, 1, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},//has different color compared to version without ps/vs
-		{1, 0, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00},
-		{1, 0, 2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00},
-		{1, 0, 2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600},
-		{1, 0, 2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},
-		{1, 1, 0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
-		{1, 1, 0, 0.2f, 0.2f, D3DFVF_XYZ,    0x0055aa00},//has different color compared to version without ps/vs
-		{1, 1, 0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
-		{1, 1, 0, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},//has different color compared to version without ps/vs
+		{1, 0, 1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700, 0x00986700},
+		{1, 0, 1, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},//has different color compared to version without ps/vs
+		{1, 0, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00, 0x00b24c00},
+		{1, 0, 2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00, 0x00b24c00},
+		{1, 0, 2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600, 0x0008f600},
+		{1, 0, 2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},
+		{1, 1, 0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00, 0x0000ff00},
+		{1, 1, 0, 0.2f, 0.2f, D3DFVF_XYZ,    0x0055aa00, 0x0055aa00},//has different color compared to version without ps/vs
+		{1, 1, 0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700, 0x00986700},
+		{1, 1, 0, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},//has different color compared to version without ps/vs
 		//40-49
-		{1, 1, 1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
-		{1, 1, 1, 0.2f, 0.2f, D3DFVF_XYZ,    0x0055aa00},//has different color compared to version without ps/vs
-		{1, 1, 1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
-		{1, 1, 1, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},//has different color compared to version without ps/vs
-		{1, 1, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00},
-		{1, 1, 2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00},
-		{1, 1, 2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600},
-		{1, 1, 2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},
-		{0, 2, 0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
-		{0, 2, 0, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff},
+		{1, 1, 1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00, 0x0000ff00},
+		{1, 1, 1, 0.2f, 0.2f, D3DFVF_XYZ,    0x0055aa00, 0x0055aa00},//has different color compared to version without ps/vs
+		{1, 1, 1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700, 0x00986700},
+		{1, 1, 1, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},//has different color compared to version without ps/vs
+		{1, 1, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00, 0x00b24c00},
+		{1, 1, 2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00, 0x00b24c00},
+		{1, 1, 2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600, 0x0008f600},
+		{1, 1, 2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},
+		{0, 2, 0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00, 0x0000ff00},
+		{0, 2, 0, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},
 		//50-59
-		{0, 2, 0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
-		{0, 2, 0, 1.2f, 1.2f, D3DFVF_XYZ,    0x0008f600},
-		{0, 2, 1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
-		{0, 2, 1, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff},
-		{0, 2, 1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
-		{0, 2, 1, 1.2f, 1.2f, D3DFVF_XYZ,    0x0000ff00},
-		{0, 2, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00},
-		{0, 2, 2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00},
-		{0, 2, 2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600},
-		{0, 2, 2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},
+		{0, 2, 0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700, 0x00986700},
+		{0, 2, 0, 1.2f, 1.2f, D3DFVF_XYZ,    0x0008f600, 0x0008f600},
+		{0, 2, 1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00, 0x0000ff00},
+		{0, 2, 1, 0.2f, 0.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},
+		{0, 2, 1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700, 0x00986700},
+		{0, 2, 1, 1.2f, 1.2f, D3DFVF_XYZ,    0x0000ff00, 0x0000ff00},
+		{0, 2, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00, 0x00aa5500},//Radeon HD8400-left, Ivy Bridge GT1-right
+		{0, 2, 2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00, 0x00aa5500},//Radeon HD8400-left, Ivy Bridge GT1-right
+		{0, 2, 2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600, 0x00aa5500},//Radeon HD8400-left, Ivy Bridge GT1-right
+		{0, 2, 2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},
 		//60-69
-		{1, 2, 0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
-		{1, 2, 0, 0.2f, 0.2f, D3DFVF_XYZ,    0x0055aa00},
-		{1, 2, 0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
-		{1, 2, 0, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},
-		{1, 2, 1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00},
-		{1, 2, 1, 0.2f, 0.2f, D3DFVF_XYZ,    0x0055aa00},
-		{1, 2, 1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700},
-		{1, 2, 1, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},
-		{1, 2, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00},
-		{1, 2, 2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00},
+		{1, 2, 0, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00, 0x0000ff00},
+		{1, 2, 0, 0.2f, 0.2f, D3DFVF_XYZ,    0x0055aa00, 0x0055aa00},
+		{1, 2, 0, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700, 0x00986700},
+		{1, 2, 0, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},
+		{1, 2, 1, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x0000ff00, 0x0000ff00},
+		{1, 2, 1, 0.2f, 0.2f, D3DFVF_XYZ,    0x0055aa00, 0x0055aa00},
+		{1, 2, 1, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x00986700, 0x00986700},
+		{1, 2, 1, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},
+		{1, 2, 2, 0.2f, 0.2f, D3DFVF_XYZRHW, 0x00b24c00, 0x00aa5500},//Radeon HD8400-left, Ivy Bridge GT1-right
+		{1, 2, 2, 0.2f, 0.2f, D3DFVF_XYZ,    0x00b24c00, 0x00aa5500},//Radeon HD8400-left, Ivy Bridge GT1-right
 		//70-71
-		{1, 2, 2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600},
-		{1, 2, 2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff},
+		{1, 2, 2, 1.2f, 1.2f, D3DFVF_XYZRHW, 0x0008f600, 0x00aa5500},//Radeon HD8400-left, Ivy Bridge GT1-right
+		{1, 2, 2, 1.2f, 1.2f, D3DFVF_XYZ,    0x000000ff, 0x000000ff},
 	};
 	unsigned int i;
 
@@ -447,8 +447,8 @@ int main(int argc, char* argv[]) {
 		}
 
 		color = getPixelColor(device, 320, 240);
-		ok(color_match(color, tests[i].color, 2),
-			"Got unexpected color 0x%08x, expected 0x%08x, case %u.\n", color, tests[i].color, i);
+		ok(color_match(color, tests[i].color1, 2) || color_match(color, tests[i].color2, 2),
+			"Got unexpected color 0x%08x, expected 0x%08x or 0x%08x, case %u.\n", color, tests[i].color1, tests[i].color2, i);
 		hr = IDirect3DDevice9_Present(device, NULL, NULL, NULL, NULL);
 		ok(SUCCEEDED(hr), "Failed to present, hr %#x.\n", hr);
 	}
