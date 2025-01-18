@@ -4,21 +4,32 @@ on: [push, pull_request]
 
 jobs:
   linux:
-    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-24.04-arm, ubuntu-24.04]
         configuration: [Debug]
         triangle_path: [sdl_d3d9_hlsl_triangle, sdl_d3d9_triangle]
         nine: [ON, OFF]
         include:
-          - configuration: Debug
+          - os: ubuntu-24.04-arm
+            configuration: Debug
+            triangle_path: sdl_pure_triangle
+            nine: NOT_USED
+          - os: ubuntu-24.04
+            configuration: Debug
             triangle_path: sdl_pure_triangle
             nine: NOT_USED
         exclude:
-          - configuration: Debug
+          - os: ubuntu-24.04-arm
+            configuration: Debug
             triangle_path: sdl_d3d9_hlsl_triangle
             nine: ON
+          - os: ubuntu-24.04
+            configuration: Debug
+            triangle_path: sdl_d3d9_hlsl_triangle
+            nine: ON
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v2
