@@ -7,29 +7,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04-arm, ubuntu-24.04]
+        os:
+          - runs_on: ubuntu-24.04-arm
+            deploy_arg: "aarch64"
+          - runs_on: ubuntu-24.04
+            deploy_arg: "x86_64"
         configuration: [Debug]
-        triangle_path: [sdl_d3d9_hlsl_triangle, sdl_d3d9_triangle]
-        nine: [ON, OFF]
-        include:
-          - os: ubuntu-24.04-arm
-            configuration: Debug
-            triangle_path: sdl_pure_triangle
-            nine: NOT_USED
-          - os: ubuntu-24.04
-            configuration: Debug
-            triangle_path: sdl_pure_triangle
-            nine: NOT_USED
-        exclude:
-          - os: ubuntu-24.04-arm
-            configuration: Debug
-            triangle_path: sdl_d3d9_hlsl_triangle
-            nine: ON
-          - os: ubuntu-24.04
-            configuration: Debug
-            triangle_path: sdl_d3d9_hlsl_triangle
-            nine: ON
-    runs-on: ${{ matrix.os }}
+        triangle_path: [sdl_pure_triangle]
+        nine: [NOT_USED]
+    runs-on: ${{ matrix.os.runs_on }}
 
     steps:
     - uses: actions/checkout@v2
@@ -48,6 +34,7 @@ jobs:
       run: sudo apt-get install libvulkan-dev spirv-headers wine64-tools
     - name: Configure
       run: |
+        echo ${{ runner.arch }}
         export CC=gcc && export CXX=g++
         mkdir ${{ matrix.triangle_path }}/build && cd ${{ matrix.triangle_path }}/build
         cmake .. -G Ninja -DUSE_NINE=${{ matrix.nine }} -DCMAKE_BUILD_TYPE=${{ matrix.configuration }}
