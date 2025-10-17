@@ -3,57 +3,38 @@ name: Linux CI
 on: [push, pull_request]
 
 jobs:
-  linux:
+  linux-cmake:
+    name: Lin ${{matrix.TrianglePath}} ${{matrix.OS}} ${{matrix.Configuration}}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04-arm, ubuntu-24.04]
-        configuration: [Debug]
-        triangle_path: [sdl_d3d9_hlsl_triangle, sdl_d3d9_triangle]
-        nine: [ON, OFF]
-        include:
-          - os: ubuntu-24.04-arm
-            configuration: Debug
-            triangle_path: sdl_pure_triangle
-            nine: NOT_USED
-          - os: ubuntu-24.04
-            configuration: Debug
-            triangle_path: sdl_pure_triangle
-            nine: NOT_USED
-        exclude:
-          - os: ubuntu-24.04-arm
-            configuration: Debug
-            triangle_path: sdl_d3d9_hlsl_triangle
-            nine: ON
-          - os: ubuntu-24.04
-            configuration: Debug
-            triangle_path: sdl_d3d9_hlsl_triangle
-            nine: ON
-    runs-on: ${{ matrix.os }}
+        OS: [ubuntu-24.04-arm, ubuntu-24.04]
+        Configuration: [Debug]
+        TrianglePath: [sdl_d3d9_hlsl_triangle, sdl_d3d9_triangle]
+    runs-on: ${{matrix.OS}}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@main
       with:
         fetch-depth: 0
+        submodules: true
     - name: Install common libs
       run: sudo apt-get update && sudo apt-get install libsdl2-dev ninja-build
-    - name: Install libs for Gallium Nine build
-      if: ${{ matrix.nine == 'ON' }}
-      run: sudo apt-get install libx11-dev libxcb-present-dev libxcb-dri3-dev libxcb-xfixes0-dev libx11-xcb-dev libdrm-dev libd3dadapter9-mesa-dev
     - name: Install libs for DXVK Native build
-      if: ${{ matrix.nine == 'OFF' }}
       run: sudo apt-get install libvulkan-dev glslang-tools meson
     - name: Install libs for VKD3D (when hlsl build)
-      if: ${{ matrix.triangle_path == 'sdl_d3d9_hlsl_triangle' }}
-      run: sudo apt-get install libvulkan-dev spirv-headers wine64-tools
-    - name: Configure
+      if: ${{ matrix.TrianglePath == 'sdl_d3d9_hlsl_triangle' }}
+      run: sudo apt-get install libjson-perl libvulkan-dev spirv-headers wine64-tools
+    - name: Build
       run: |
-        export CC=gcc && export CXX=g++
-        mkdir ${{ matrix.triangle_path }}/build && cd ${{ matrix.triangle_path }}/build
-        cmake .. -G Ninja -DUSE_NINE=${{ matrix.nine }} -DCMAKE_BUILD_TYPE=${{ matrix.configuration }}
-    - name: Build and check file
-      working-directory: ${{ matrix.triangle_path }}/build
+        export VCPKG_ROOT=/usr/local/share/vcpkg
+        export CC=clang && export CXX=clang++
+        ${CXX} --version && cmake --version
+        cd ${{matrix.TrianglePath}}
+        cmake --preset=VCPKG-${{matrix.Configuration}}
+        cmake --build build/VCPKG-${{matrix.Configuration}}
+    - name: Check file
+      working-directory: ${{matrix.TrianglePath}}/build/VCPKG-${{matrix.Configuration}}/${{matrix.Configuration}}
       run: |
-        ninja
-        file ./${{ matrix.configuration }}/${{ matrix.triangle_path }}
-        ldd ./${{ matrix.configuration }}/${{ matrix.triangle_path }}
+        file ./${{matrix.TrianglePath}}
+        ldd ./${{matrix.TrianglePath}}
