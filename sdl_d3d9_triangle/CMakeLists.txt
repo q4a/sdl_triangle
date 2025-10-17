@@ -4,7 +4,6 @@ project(sdl_d3d9_triangle)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 
 if (NOT WIN32)
-option(USE_CONAN "Use Conan build system" OFF)
 option(USE_NINE "Use Gallium Nine for native D3D9 API" OFF)
 endif()
 
@@ -13,26 +12,11 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 ### Set up output paths
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 
-if (WIN32 OR USE_CONAN)
-include(conan)
-### for CONAN_PKG::directx
-conan_add_remote(NAME storm
-    URL https://storm.jfrog.io/artifactory/api/conan/conan-remote
-    VERIFY_SSL True
-)
-conan_cmake_run(CONANFILE conanfile.py
-    BASIC_SETUP CMAKE_TARGETS
-    BUILD missing
-)
-set(SDL_DEPS "CONAN_PKG::sdl")
-else()
-#sudo apt install libsdl2-dev
-set(SDL_DEPS "SDL2")
-endif()
+find_package(SDL2 CONFIG REQUIRED)
 
 # Source files
 
@@ -52,7 +36,16 @@ add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES})
 
 if (WIN32)
     message("Using Windows D3D9 API")
-    set(NATIVE_D3D9_LIBS "CONAN_PKG::directx")
+    set(DIRECTX_INCLUDE_DIRS
+        "${CMAKE_CURRENT_SOURCE_DIR}/../external/dxsdk-june2010/Include"
+    )
+    set(NATIVE_D3D9_LIBS
+        "${CMAKE_CURRENT_SOURCE_DIR}/../external/dxsdk-june2010/Lib/x64/d3d9.lib"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../external/dxsdk-june2010/Lib/x64/d3dx9.lib"
+    )
+    target_include_directories(${PROJECT_NAME} PRIVATE
+        "${DIRECTX_INCLUDE_DIRS}"
+    )
 elseif (USE_NINE) # for Gallium Nine
     message("Using Gallium Nine for native D3D9 API")
 
@@ -118,7 +111,6 @@ endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${NATIVE_D3D9_LIBS}
-    ${SDL_DEPS}
+    SDL2::SDL2
+    SDL2::SDL2main
 )
-
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})

@@ -3,28 +3,29 @@ name: Windows CI
 on: [push, pull_request]
 
 jobs:
-  windows:
-    runs-on: windows-2019
+  windows-cmake:
+    name: Win ${{matrix.TrianglePath}} ${{matrix.Configuration}}
+    runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
-        configuration: [msvc-debug]
-        triangle_path: [sdl_d3d9_hlsl_triangle, sdl_d3d9_triangle, sdl_pure_triangle]
+        Configuration: [Debug]
+        TrianglePath: [sdl_d3d9_hlsl_triangle, sdl_d3d9_triangle, sdl_pure_triangle]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@main
       with:
         fetch-depth: 0
+        submodules: true
+    - name: Install common libs
+      run: vcpkg install sdl2
     - uses: ilammy/msvc-dev-cmd@v1
-    - name: Install Conan
-      run: pip install conan==1.59.0
-    - name: Configure with CMakeSettings.json and build
-      uses: lukka/run-cmake@v3
-      with:
-        cmakeListsOrSettingsJson: CMakeSettingsJson
-        cmakeSettingsJsonPath: '${{ github.workspace }}/${{ matrix.triangle_path }}/CMakeSettings.json'
-        useVcpkgToolchainFile: false
-        buildDirectory: '${{ github.workspace }}/build'
-        configurationRegexFilter: '${{ matrix.configuration }}'
-    - name: Check file
+    - name: Build
       run: |
-        dir build\${{ matrix.configuration }}\bin
+        $Env:VCPKG_ROOT="C:/vcpkg"
+        cd ${{matrix.TrianglePath}}
+        cmake --preset=VCPKG-${{matrix.Configuration}}
+        cmake --build build/VCPKG-${{matrix.Configuration}}
+    - name: Check file
+      working-directory: ${{matrix.TrianglePath}}/build/VCPKG-${{matrix.Configuration}}/${{matrix.Configuration}}
+      run: |
+        dir
