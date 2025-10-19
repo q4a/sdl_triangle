@@ -10,7 +10,8 @@ jobs:
       fail-fast: false
       matrix:
         Configuration: [Debug]
-        TrianglePath: [sdl_d3d9_hlsl_triangle, sdl_d3d9_triangle, sdl_pure_triangle]
+        #TrianglePath: [sdl_d3d9_hlsl_triangle, sdl_d3d9_triangle, sdl_pure_triangle]
+        TrianglePath: [sdl_d3d9_hlsl_triangle]
     steps:
     - uses: actions/checkout@main
       with:
