@@ -263,6 +263,15 @@ int main(int argc, char* argv[]) {
 	//Creating the context for SDL2.
 	SDL_Window* Window = createWindowContext("Hello World!");
 
+	std::uint32_t shaderBufferSize = 5760;
+	ID3DBlob* codeBufferBlob = nullptr;
+	HRESULT hRet = D3DCreateBlob(shaderBufferSize, &codeBufferBlob);
+	if (FAILED(hRet))
+	{
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to D3DCreateBlob(5760, &codeBufferBlob)", nullptr);
+		return 0;
+	}
+
 	if (!d3d::InitD3D(Window,
 		Width, Height, true, D3DDEVTYPE_HAL, &Device))
 	{
