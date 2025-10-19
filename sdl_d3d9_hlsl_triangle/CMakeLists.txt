@@ -120,30 +120,47 @@ else()
             "${NINE_NATIVE_INCLUDE_DIRS}"
         )
         add_dependencies(${PROJECT_NAME} nine-native)
-    else() # for DXVK Native
-        message("Using DXVK Native for D3D9 API")
+    else() # for DXVK
 
-        ExternalProject_Add(dxvk-native
-            GIT_REPOSITORY    https://github.com/q4a/dxvk-native
-            GIT_TAG           master
-            GIT_SHALLOW       ON
+        option(USE_OLD_DXVK "Use old DXVK Native for native D3D11 API" OFF)
+        if (USE_OLD_DXVK)
+            message("Using DXVK Native for D3D11 API")
+            set(DXVK_TYPE "native")
+            set(DXVK_GIT_REPOSITORY "https://github.com/q4a/dxvk-native")
+            set(DXVK_GIT_TAG "master")
+            set(DXVK_EXTRA_PARAM "")
+        else()
+            message("Using upstream DXVK for D3D11 API")
+            set(DXVK_TYPE "upstream")
+            set(DXVK_GIT_REPOSITORY "https://github.com/doitsujin/dxvk")
+            set(DXVK_GIT_TAG "v2.7.1")
+            set(DXVK_EXTRA_PARAM "-Denable_d3d8=false")
+        endif()
+        include(ExternalProject)
+        set(DXVK_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build/dxvk-src-${DXVK_TYPE}")
+        set(DXVK_BINARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build/dxvk-bin-${DXVK_TYPE}")
+        set(DXVK_INCLUDE_DIRS
+            "${DXVK_SOURCE_DIR}/include/native/directx"
+            "${DXVK_SOURCE_DIR}/include/native/windows"
+        )
+        ExternalProject_Add(dxvk
+            GIT_REPOSITORY    ${DXVK_GIT_REPOSITORY}
+            GIT_TAG           ${DXVK_GIT_TAG}
+            GIT_SHALLOW       OFF
             BUILD_ALWAYS      OFF
+            SOURCE_DIR        ${DXVK_SOURCE_DIR}
+            BINARY_DIR        ${DXVK_BINARY_DIR}
             CONFIGURE_HANDLED_BY_BUILD ON
-            CONFIGURE_COMMAND meson setup ../dxvk-native --buildtype=release -Denable_d3d11=false -Denable_d3d10=false -Denable_dxgi=false
+            CONFIGURE_COMMAND meson setup ../dxvk-src-${DXVK_TYPE} --buildtype=release ${DXVK_EXTRA_PARAM} -Denable_d3d9=true -Denable_d3d10=false -Denable_d3d11=false -Denable_dxgi=false
             BUILD_COMMAND     ninja
-            BUILD_BYPRODUCTS  <BINARY_DIR>/src/d3d9/libdxvk_d3d9.so
+            BUILD_BYPRODUCTS  ${DXVK_BINARY_DIR}/src/d3d9/libdxvk_d3d9.so
             INSTALL_COMMAND   ""
         )
-        ExternalProject_Get_property(dxvk-native SOURCE_DIR BINARY_DIR)
-        set(DXVK_NATIVE_INCLUDE_DIRS
-            "${SOURCE_DIR}/include/native/directx"
-            "${SOURCE_DIR}/include/native/windows"
-        )
-        set(NATIVE_D3D9_LIBS ${NATIVE_D3D9_LIBS} ${BINARY_DIR}/src/d3d9/libdxvk_d3d9.so)
+        set(NATIVE_D3D9_LIBS ${NATIVE_D3D9_LIBS} ${DXVK_BINARY_DIR}/src/d3d9/libdxvk_d3d9.so)
         target_include_directories(${PROJECT_NAME} PRIVATE
-            "${DXVK_NATIVE_INCLUDE_DIRS}"
+            "${DXVK_INCLUDE_DIRS}"
         )
-        add_dependencies(${PROJECT_NAME} dxvk-native)
+        add_dependencies(${PROJECT_NAME} dxvk)
     endif()
 endif() # WIN32
 
